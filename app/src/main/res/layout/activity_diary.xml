@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ScrollView1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".MainActivity"
+        android:background="#345F53">
+
+        <ImageView
+            android:id="@+id/img"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:src="@drawable/jeju00" />
+
+        <LinearLayout
+            android:id="@+id/diaryContents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/diaryTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:text="제주 곽지해수욕장"
+                    android:textSize="20dp"
+                    android:padding="30px"
+                    android:textColor="#ECE6CC"
+                    />
+                <ImageView
+                    android:id="@+id/diaryFeel"
+                    android:layout_width="100px"
+                    android:layout_height="100px"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/middle"
+                    android:layout_margin="20px"
+                    android:layout_alignParentRight="true"/>
+            </RelativeLayout>
+            <TextView
+                android:id="@+id/diaryDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="date"
+                android:text="2020/11/1"
+                android:textSize="20dp"
+                android:padding="30px"
+                android:textColor="#ECE6CC"/>
+            <TextView
+                android:id="@+id/diary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="30px"
+                android:text="너무 추웠지만 해는 밝고 바다는 투명하여 아름다웠다.이곳의 색들의 진함을 좋아한다. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                android:textSize="20dp"
+                android:inputType="textMultiLine"
+                android:textColor="#ECE6CC"
+                />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
