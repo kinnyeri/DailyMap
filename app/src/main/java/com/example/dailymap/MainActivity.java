@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
     public void onClickCalendar(View v){
-        Intent intent = new Intent(this,CalendarList.class);
+        Intent intent = new Intent(this,Calendar.class);
         startActivity(intent);
     }
 }
