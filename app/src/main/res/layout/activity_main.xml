@@ -10,7 +10,12 @@
         android:id="@+id/moveToDiary"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:onClick="onClick"
+        android:onClick="onClickDiary"
         android:text="Diary"/>
-
+    <Button
+        android:id="@+id/moveToCalendarList"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:onClick="onClickCalendar"
+        android:text="Calendar"/>
 </LinearLayout>

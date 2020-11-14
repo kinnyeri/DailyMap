@@ -13,8 +13,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
-    public void onClick(View v){
+    public void onClickDiary(View v){
         Intent intent = new Intent(this,Diary.class);
+        startActivity(intent);
+    }
+    public void onClickCalendar(View v){
+        Intent intent = new Intent(this,CalendarList.class);
         startActivity(intent);
     }
 }
