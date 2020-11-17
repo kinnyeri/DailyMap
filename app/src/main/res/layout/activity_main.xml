@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".Main">
 
     <fragment
         android:layout_width="match_parent"
@@ -63,7 +63,15 @@
         android:layout_marginRight="10dp"
         android:background="@drawable/bg_round"
         android:src ="@drawable/ic_baseline_add_24"/>
-
+    <ImageButton
+        android:id="@+id/diary_btn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="150dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/bg_round"
+        android:src ="@drawable/ic_baseline_add_24"/>
 </FrameLayout>
 
 <!--

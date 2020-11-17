@@ -53,6 +53,17 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             }
         });
 
+        // 다이어리 확인 추가 버튼 // 지울거임
+        ImageButton diaryButton = (ImageButton) findViewById(R.id.diary_btn);
+        diaryButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Toast.makeText(getApplicationContext(),"기록장 추가 버튼", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Main.this,Diary.class);
+                startActivity(intent);
+            }
+        });
+
         // 달력 버튼
         ImageButton calendarButton = (ImageButton) findViewById(R.id.calendar_btn);
         calendarButton.setOnClickListener(new View.OnClickListener(){
@@ -70,6 +81,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             public void onClick(View view){
                 Toast.makeText(getApplicationContext(),"기록장 추가 버튼", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Main.this,AddDiary.class);
+                startActivity(intent);
             }
         });
 

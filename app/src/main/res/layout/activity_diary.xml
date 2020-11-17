@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ScrollView1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".Diary">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".Diary"
         android:background="@color/mainColor">
 
         <ImageView
@@ -44,7 +44,7 @@
                     android:layout_width="100px"
                     android:layout_height="100px"
                     android:scaleType="centerInside"
-                    android:src="@drawable/middle"
+                    android:src="@drawable/mid"
                     android:layout_margin="20px"
                     android:layout_alignParentRight="true"/>
             </RelativeLayout>
