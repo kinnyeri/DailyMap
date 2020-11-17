@@ -23,11 +23,10 @@
                 android:textColor="@color/textColor1"/>
             <ImageView
                 android:id="@+id/editSubmit"
-                android:layout_width="50dp"
+                android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:scaleType="centerInside"
-                android:padding="5dp"
-                android:src="@drawable/confirm"/>
+                android:src="@drawable/ic_baseline_check_circle_24"/>
         </LinearLayout>
         <ImageView
             android:id="@+id/editImg"
@@ -93,10 +92,11 @@
                     android:layout_weight="1"/>
             </LinearLayout>
         </LinearLayout>
+
         <EditText
             android:id="@+id/editContent"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="206dp"
             android:hint="content"
             android:inputType="textMultiLine" />
     </LinearLayout>

@@ -59,7 +59,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             public void onClick(View view){
                 Toast.makeText(getApplicationContext(),"기록장 추가 버튼", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Main.this,Diary.class);
+                Intent intent = new Intent(Main.this,DiaryList.class);
                 startActivity(intent);
             }
         });
