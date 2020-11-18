@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Daily Map</string>
+    <string-array name="diary_group_list">
+        <item>My Diary</item>
+        <item>김윤박</item>
+        <item>Kim Klub</item>
+        <item>운동하쟈</item>
+        <item>공유 다이어리 추가</item>
+    </string-array>
 </resources>

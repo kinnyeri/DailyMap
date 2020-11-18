@@ -4,20 +4,42 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class Main extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private FirebaseAuth mAuth; //auth
+    @Override //Auth 확인
+    protected void onStart() {
+        super.onStart();
+        GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
+
+        //FirebaseUser user = mAuth.getCurrentUser(); //에러 남 > 로그아웃 안됨
+        Toast.makeText(Main.this,"start",Toast.LENGTH_LONG).show();
+        if(signInAccount!=null){ //login 중
+            Toast.makeText(Main.this,signInAccount.getDisplayName(),Toast.LENGTH_SHORT).show();
+        }
+        else{ //user 없으면 signin page로 넘어가기
+            Toast.makeText(Main.this,"no one",Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(getApplicationContext(),SignIn.class);
+            startActivity(intent);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +72,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             public void onClick(View view){
                 Toast.makeText(getApplicationContext(),"계정관리 버튼", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Main.this,Account.class);
+                startActivity(intent);
             }
         });
 
