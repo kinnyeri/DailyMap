@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "134333094645",
+    "firebase_url": "https://daily-map-d47b1.firebaseio.com",
+    "project_id": "daily-map-d47b1",
+    "storage_bucket": "daily-map-d47b1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:134333094645:android:34d7ae3c9ad7cda62ec3bc",
+        "android_client_info": {
+          "package_name": "com.example.dailymap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "134333094645-nvmhtrjcm2ospu2cb9svo8ekctieubd3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dailymap",
+            "certificate_hash": "97519facb052cc9de69e413a9325d146f92d8c19"
+          }
+        },
+        {
+          "client_id": "134333094645-2n4ds883ptqp15u17lvk1aqg5ch62m0j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCE3nrNj6h3DToocceID9FZXF3Sx0EGHas"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "134333094645-2n4ds883ptqp15u17lvk1aqg5ch62m0j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
