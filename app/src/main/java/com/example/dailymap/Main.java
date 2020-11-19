@@ -27,12 +27,10 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
     @Override //Auth 확인
     protected void onStart() {
         super.onStart();
-        GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
-
-        //FirebaseUser user = mAuth.getCurrentUser(); //에러 남 > 로그아웃 안됨
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //에러 남 > 로그아웃 안됨
         Toast.makeText(Main.this,"start",Toast.LENGTH_LONG).show();
-        if(signInAccount!=null){ //login 중
-            Toast.makeText(Main.this,signInAccount.getDisplayName(),Toast.LENGTH_SHORT).show();
+        if(user!=null){ //login 중
+            Toast.makeText(Main.this,user.getDisplayName(),Toast.LENGTH_SHORT).show();
         }
         else{ //user 없으면 signin page로 넘어가기
             Toast.makeText(Main.this,"no one",Toast.LENGTH_LONG).show();
