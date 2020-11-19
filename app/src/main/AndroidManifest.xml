@@ -18,7 +18,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${googleMapApiKey}" />
 
-        <activity android:name=".Calendar" />
+        <activity android:name=".Calendar2" />
         <activity android:name=".Diary" />
         <activity android:name=".Main">
             <intent-filter>

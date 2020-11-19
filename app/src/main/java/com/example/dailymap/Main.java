@@ -94,7 +94,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             public void onClick(View view){
                 Toast.makeText(getApplicationContext(),"달력 버튼", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Main.this,Calendar.class);
+                Intent intent = new Intent(Main.this,Calendar2.class);
                 startActivity(intent);
             }
         });
