@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.SingleLineTransformationMethod;
 import android.view.View;
 import android.widget.Toast;
 
@@ -20,6 +21,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignIn extends AppCompatActivity {
 
@@ -27,11 +34,16 @@ public class SignIn extends AppCompatActivity {
     private final static int RC_SIGN_IN = 123; //any number
     private FirebaseAuth mAuth;
 
+    private DatabaseReference mReference;
+    private FirebaseDatabase mDatabase;
+    private User tmpUser;
+
     @Override
     protected void onStart() {
         super.onStart();
 
-        FirebaseUser user = mAuth.getCurrentUser();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         if(user!=null){
             Toast.makeText(SignIn.this,"user init",Toast.LENGTH_LONG).show();
             Intent intent = new Intent(getApplicationContext(),Main.class);
@@ -44,6 +56,7 @@ public class SignIn extends AppCompatActivity {
         setContentView(R.layout.activity_sign_in);
 
         mAuth=FirebaseAuth.getInstance(); //init
+        initDatabase(); //init database
         createRequest(); //init
         findViewById(R.id.googleSignIn).setOnClickListener(new View.OnClickListener(){
             @Override
@@ -52,7 +65,7 @@ public class SignIn extends AppCompatActivity {
             }
         });
     }
-    private void createRequest(){
+   private void createRequest(){
         //Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -94,15 +107,30 @@ public class SignIn extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(SignIn.this, "success", Toast.LENGTH_SHORT).show();
+
+                            //Database에 저장
+                            addNewUser(new User(user.getDisplayName(),user.getEmail()),user.getUid());
+
+                            //UI 업데이트
                             Intent intent = new Intent(getApplicationContext(),Main.class);
                             startActivity(intent);
                             //updateUI(user);
                         } else {
-                            // If sign in fails, display a message to the user.
-                            //updateUI(null);
+                            // If sign in fails, display a message to the user
                             Toast.makeText(SignIn.this, "sorry auth failed", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+    }
+    //RDB
+    private void initDatabase(){
+        mDatabase = FirebaseDatabase.getInstance();
+        mReference = mDatabase.getReference();
+    }
+    private void addNewUser(User tmp,String uid){
+        String key = uid+""+0; //최초 로그인 이후에는 default 개인 다이어리그룹 만드는 것 방지
+        tmp.addDiaryGroup(key);
+        mReference.child("User").child(uid).setValue(tmp); //user 저장
+        mReference.child("DiaryGroupList").child(key).setValue(new DiaryGroup(tmp.name+"'s diary",tmp.email));
     }
 }
