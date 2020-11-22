@@ -54,15 +54,6 @@
         android:orientation="vertical">
 
         <ImageButton
-            android:id="@+id/diary_btn"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/bg_round"
-            android:src ="@drawable/ic_baseline_add_24"/>
-
-        <ImageButton
             android:id="@+id/calendar_btn"
             android:layout_width="60dp"
             android:layout_height="60dp"
@@ -127,23 +118,38 @@
                 android:id="@+id/place_text"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.5"
+                android:layout_weight="0.4"
                 android:text="경복궁"
                 android:textSize="30dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"/>
 
-            <TextView
-                android:id="@+id/recordNum_text"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.5"
-                android:text="기록 +9"
-                android:textSize="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:paddingLeft="10dp"/>
+                android:layout_weight="0.6">
+
+                <TextView
+                    android:id="@+id/recordNum_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="기록 +9"
+                    android:textSize="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:paddingLeft="10dp"/>
+
+                <ImageButton
+                    android:id="@+id/sliding_add_btn"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/bg_round"
+                    android:src="@drawable/ic_baseline_add_24" />
+            </RelativeLayout>
 
         </LinearLayout>
 

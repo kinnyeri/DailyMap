@@ -118,7 +118,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                     HideLayout(slidePage, slideButtons);
                 }
 
-                // 슬라이딩 화면(마커 클릭 시 나온 화면), 가상키보드 안 보이는 경우 마커 추가
+                // 슬라이딩 화면(마커 클릭 시 나온 화면) 안 보이는 경우 마커 추가
                 else if(slidePage.getVisibility()==View.GONE ){
                     // ReverseGeocoding 함수 : 역지오코딩 (위도,경도 -> 주소,지명)
                     // 반환값 예시
@@ -165,17 +165,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             }
         });
 
-        // 다이어리 확인 추가 버튼 // 지울거임
-        ImageButton diaryButton = (ImageButton) findViewById(R.id.diary_btn);
-        diaryButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"다이어리 확인 버튼", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Main.this,DiaryList.class);
-                startActivity(intent);
-            }
-        });
-
         // 달력 버튼
         ImageButton calendarButton = (ImageButton) findViewById(R.id.calendar_btn);
         calendarButton.setOnClickListener(new View.OnClickListener(){
@@ -194,6 +183,28 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             public void onClick(View view){
                 Toast.makeText(getApplicationContext(),"기록장 추가 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,AddDiary.class);
+                startActivity(intent);
+            }
+        });
+
+        // 슬라이딩 화면 기록장 추가 버튼
+        ImageButton addButton_slide = (ImageButton) findViewById(R.id.sliding_add_btn);
+        addButton_slide.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Toast.makeText(getApplicationContext(),"슬라이딩 패널 기록장 추가 버튼", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Main.this,AddDiary.class);
+                startActivity(intent);
+            }
+        });
+
+        // 슬라이딩 패널 -> 누르면 다이어리 확인 창으로 넘어감
+        LinearLayout slidingPanel = (LinearLayout) findViewById(R.id.sliding_page);
+        slidingPanel.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Toast.makeText(getApplicationContext(),"슬라이딩 패널 클릭", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Main.this,DiaryList.class);
                 startActivity(intent);
             }
         });
@@ -315,14 +326,14 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         return null;
     }
 
-    // 기록장 미리보기화면, 버튼들 위로 슬라이딩
+    // 기록장 미리보기화면 위로 슬라이딩, 기존 버튼 숨기기
     private void ShowLayout(LinearLayout page, final LinearLayout buttons ){
         // 기록장 미리보기 화면 위로 슬라이딩
         final Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
         page.setVisibility(View.VISIBLE);
         page.startAnimation(slideUp);
 
-        // 버튼도 위로 슬라이딩
+        // 버튼 숨기기 (알파값 1->0)
         final Animation btnSlideUp = AnimationUtils.loadAnimation(this, R.anim.btn_slide_up);
         btnSlideUp.setFillAfter(true);
         buttons.startAnimation(btnSlideUp);
@@ -352,14 +363,14 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
          */
     }
 
-    // 기록장 미리보기화면, 버튼들 아래로 슬라이딩
+    // 기록장 미리보기화면 아래로 슬라이딩, 기존 버튼 보이게
     private void HideLayout(LinearLayout page, LinearLayout buttons){
         // 기록장 미리보기 화면 아래로 슬라이딩
         final Animation slideDown = AnimationUtils.loadAnimation(this, R.anim.slide_down);
         page.startAnimation(slideDown);
         page.setVisibility(View.GONE); // 화면 안 보이도록 설정
 
-        // 버튼도 아래로 슬라이딩
+        // 버튼 보이게 (알파값 0->1)
         final Animation btnSlideDown = AnimationUtils.loadAnimation(this, R.anim.btn_slide_down);
         buttons.startAnimation(btnSlideDown);
     }
