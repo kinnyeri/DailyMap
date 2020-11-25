@@ -96,7 +96,7 @@
         <EditText
             android:id="@+id/editContent"
             android:layout_width="match_parent"
-            android:layout_height="206dp"
+            android:layout_height="wrap_content"
             android:hint="content"
             android:inputType="textMultiLine" />
     </LinearLayout>

@@ -15,28 +15,27 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class SignIn extends AppCompatActivity {
-
+    //Auth
     private GoogleSignInClient mGoogleSignInClient;
     private final static int RC_SIGN_IN = 123; //any number
     private FirebaseAuth mAuth;
 
-    private DatabaseReference mReference;
-    private FirebaseDatabase mDatabase;
-    private User tmpUser;
+    //CFS
+    private FirebaseFirestore db;
 
     @Override
     protected void onStart() {
@@ -50,17 +49,33 @@ public class SignIn extends AppCompatActivity {
             startActivity(intent);
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+        //CFS
+        db = FirebaseFirestore.getInstance(); //Init Firestore
+//        Map<String, Object> user = new HashMap<>();
+//        user.put("first", "Ada");
+//        user.put("last", "Lovelace");
+//        user.put("born", 1815);
+//
+//        db.collection("test")
+//                .add(user)
+//                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                    @Override
+//                    public void onSuccess(DocumentReference documentReference) {
+//                        Toast.makeText(SignIn.this,"CFS SUCC",Toast.LENGTH_SHORT).show();
+//                    }
+//                });
 
-        mAuth=FirebaseAuth.getInstance(); //init
-        initDatabase(); //init database
-        createRequest(); //init
+        mAuth=FirebaseAuth.getInstance(); //init Auth
+        createRequest(); //init GoogleAuth
         findViewById(R.id.googleSignIn).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                //sign in 버튼 클릭 시
                 signIn();
             }
         });
@@ -122,15 +137,25 @@ public class SignIn extends AppCompatActivity {
                     }
                 });
     }
-    //RDB
-    private void initDatabase(){
-        mDatabase = FirebaseDatabase.getInstance();
-        mReference = mDatabase.getReference();
-    }
     private void addNewUser(User tmp,String uid){
-        String key = uid+""+0; //최초 로그인 이후에는 default 개인 다이어리그룹 만드는 것 방지
-        tmp.addDiaryGroup(key);
-        mReference.child("User").child(uid).setValue(tmp); //user 저장
-        mReference.child("DiaryGroupList").child(key).setValue(new DiaryGroup(tmp.name+"'s diary",tmp.email));
+        String key = uid+"000"; // 개인 다이어리 생성 개수 : 2^3 8개
+        //FST
+        tmp.diaryGroupList.add(key);
+        db.collection("UserList").document(uid)
+                .set(tmp)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void v) {
+                        Toast.makeText(SignIn.this,"USER SUCC",Toast.LENGTH_SHORT).show();
+                    }
+                });
+        db.collection("DiaryGroupList").document(key)
+                .set(new DiaryGroup(tmp.name+"'s diary",tmp.email))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void v) {
+                        Toast.makeText(SignIn.this,"DG SUCC",Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

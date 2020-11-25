@@ -7,12 +7,24 @@ public class User {
     public String email;
     public Vector<String> diaryGroupList;
 
+    public User(){
+
+    }
     public User(String name, String email){
         this.name=name;
         this.email=email;
         this.diaryGroupList = new Vector<String>();
     }
-    public void addDiaryGroup(String newKey){
-        this.diaryGroupList.add(newKey);
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Vector<String> getDiaryGroupList() {
+        return diaryGroupList;
     }
 }
