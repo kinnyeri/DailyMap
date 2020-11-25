@@ -251,12 +251,12 @@ public class AddDiary extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 location = intent.getStringExtra("location");
                 latitude = intent.getDoubleExtra("latitude", 0);
-                latitude = intent.getDoubleExtra("longitude", 0);
+                longitude = intent.getDoubleExtra("longitude", 0);
                 LatLng latLng = new LatLng(latitude,longitude);
-
+                
                 place = findViewById(R.id.editPlace);
                 place.setText(location);
-                newD.setLocation(latitude,latitude);
+                newD.setLocation(latitude,longitude);
                 System.out.println(latLng);
             }
         }
