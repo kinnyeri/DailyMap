@@ -6,31 +6,25 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
-import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -47,32 +41,26 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class Main extends AppCompatActivity implements OnMapReadyCallback {
+public class SearchLocation extends AppCompatActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback{
 
     private GoogleMap mMap;
     private Geocoder geocoder;
-    private FirebaseAuth mAuth; //auth
 
-    //++ ====================================
     private View mapView;
-    private MapFragment mMapFragment;
-    private View mMyLocationButtonView = null;
-    private Marker currentMarker = null;
+    private Marker currentMarker = null; // 현재 위치 표시 마커
 
-    private static final String TAG = "project";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int UPDATE_INTERVAL_MS = 1000;  // 1초
     private static final int FASTEST_UPDATE_INTERVAL_MS = 500; // 0.5초
 
-    // onRequestPermissionsResult에서 수신된 결과에서 ActivityCompat.requestPermissions를 사용한 퍼미션 요청을 구별하기 위해 사용됩니다.
+    // onRequestPermissionsResult에서 수신된 결과에서 ActivityCompat.requestPermissions를 사용한 퍼미션 요청을 구별하기 위해 사용됨
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     boolean needRequest = false;
 
@@ -87,43 +75,12 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
     private Location location;
 
     private View mLayout; // Snackbar 사용하기 위해서는 View가 필요
-    // ======================================
-
-    @Override //Auth 확인
-    protected void onStart() {
-        super.onStart();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //에러 남 > 로그아웃 안됨
-        Toast.makeText(Main.this,"start",Toast.LENGTH_LONG).show();
-        if(user!=null){ //login 중
-            Toast.makeText(Main.this,user.getDisplayName(),Toast.LENGTH_SHORT).show();
-        }
-        else{ //user 없으면 signin page로 넘어가기
-            Toast.makeText(Main.this,"no one",Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(getApplicationContext(),SignIn.class);
-            startActivity(intent);
-        }
-
-        // ++ ===============================================
-        if (checkPermission()) {
-
-            System.out.println("onStart : call mFusedLocationClient.requestLocationUpdates");
-            mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-
-            if (mMap!=null)
-                mMap.setMyLocationEnabled(true);
-            //mMyLocationButtonView = mMapFragment.getView().findViewWithTag("GoogleMapMyLocationButton");
-            //mMyLocationButtonView.setBackgroundColor(Color.GREEN);
-        }
-        // ==================================================
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_search_location);
 
-        // ++ ============================
-        mLayout = findViewById(R.id.layout_main);
         locationRequest = new LocationRequest()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL_MS)
@@ -134,14 +91,12 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 new LocationSettingsRequest.Builder();
 
         builder.addLocationRequest(locationRequest);
-
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        // ====================================
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapView = mapFragment.getView();
-        mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync((OnMapReadyCallback) this);
     }
 
     @Override
@@ -151,8 +106,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         geocoder = new Geocoder(this);
 
         // ++ ====================================================
-        //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
-        //지도의 초기위치를 서울로 이동
+        //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에 지도의 초기위치를 서울로 이동
         setDefaultLocation();
 
         // 런타임 퍼미션 처리
@@ -166,28 +120,28 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED   ) {
 
             // 2. 이미 퍼미션을 가지고 있다면
-            // ( 안드로이드 6.0 이하 버전은 런타임 퍼미션이 필요없기 때문에 이미 허용된 걸로 인식합니다.)
+            // ( 안드로이드 6.0 이하 버전은 런타임 퍼미션이 필요없기 때문에 이미 허용된 걸로 인식)
             startLocationUpdates(); // 3. 위치 업데이트 시작
         }
-        else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
-            // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
+        else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요. 2가지 경우(3-1, 4-1) 존재.
+            // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {
-                // 3-2. 요청을 진행하기 전에 사용자가에게 퍼미션이 필요한 이유를 설명해줄 필요가 있습니다.
+                // 3-2. 요청을 진행하기 전에 사용자가에게 퍼미션이 필요한 이유를 설명
                 Snackbar.make(mLayout, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.",
                         Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
 
                     @Override
                     public void onClick(View view) {
-                        // 3-3. 사용자게에 퍼미션 요청을 합니다. 요청 결과는 onRequestPermissionResult에서 수신됩니다.
-                        ActivityCompat.requestPermissions( Main.this, REQUIRED_PERMISSIONS,
+                        // 3-3. 사용자에게 퍼미션 요청. 요청 결과는 onRequestPermissionResult에서 수신됨.
+                        ActivityCompat.requestPermissions( SearchLocation.this, REQUIRED_PERMISSIONS,
                                 PERMISSIONS_REQUEST_CODE);
                     }
                 }).show();
 
 
             } else {
-                // 4-1. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 합니다.
-                // 요청 결과는 onRequestPermissionResult에서 수신됩니다.
+                // 4-1. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 함
+                // 요청 결과는 onRequestPermissionResult에서 수신됨
                 ActivityCompat.requestPermissions( this, REQUIRED_PERMISSIONS,
                         PERMISSIONS_REQUEST_CODE);
             }
@@ -210,15 +164,12 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             for (int i = 0; i < ruleList.length; i ++) {
                 layoutParams.removeRule(i);
             }
-            //
-            //layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
-            layoutParams.setMargins(1500, 0, 50, 150);
+            layoutParams.setMargins(0, 0, 50, 150);
         }
 
         // ====================================================
-
 
         LatLng SEOUL = new LatLng(37.57, 126.97);
         // 마커 추가
@@ -226,28 +177,31 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         // SEOUL로 카메라 시점 이동
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SEOUL, 10));
 
-        // 메인화면 버튼 핸들러 : 계정관리, (다이어리확인), 달력, 기록장추가 버튼
-        MainUIBtnHandler();
-
         // 검색 핸들러
         SearchHandler();
-
-        // 슬라이딩 애니메이션 적용 레이아웃
-        final LinearLayout slidePage = findViewById(R.id.sliding_page); //기록장 미리보기 화면
-        final LinearLayout slideButtons = findViewById(R.id.sliding_buttonPanel); // 버튼 패널 (기록장 추가, 달력 버튼)
 
         // 마커 클릭에 대한 이벤트 처리
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                Toast.makeText(getApplicationContext(),"마커 클릭!!", Toast.LENGTH_SHORT).show();
+                System.out.println("마커 클릭!!!!");
 
-                // 마커 정보 표시
-                marker.showInfoWindow();
+                // 마커 클릭한 경우
+                // 위치 정보 기록장 추가 화면으로 넘겨주기
+                //String location = marker.getTitle();
+                String location = marker.getSnippet();
+                double latitude = marker.getPosition().latitude;
+                double longitude = marker.getPosition().longitude;
 
-                // 마커 클릭한 경우, 기록장 미리보기 화면 띄우기
-                if(slidePage.getVisibility()==View.GONE){
-                    ShowLayout(slidePage, slideButtons);
-                }
+                // 주소, 위도, 경도 값 AddDiary 화면으로 넘겨주기
+                Intent intent = new Intent(getApplicationContext(), AddDiary.class);
+                intent.putExtra("location", location);
+                intent.putExtra("latitude", latitude);
+                intent.putExtra("longitude", longitude);
+
+                setResult(RESULT_OK, intent);
+                finish();
 
                 return true;
             }
@@ -262,15 +216,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 final EditText searchBox= findViewById(R.id.edit_text);
                 HideKeyboard(searchBox);
 
-                // 슬라이딩 화면(마커 클릭 시 나온 화면) 보이는 경우 다시 내려가게 하기
-                if(slidePage.getVisibility()==View.VISIBLE){
-                    HideLayout(slidePage, slideButtons);
-                }
-
-                // 슬라이딩 화면(마커 클릭 시 나온 화면) 안 보이는 경우 마커 추가
-                else if(slidePage.getVisibility()==View.GONE ){
-                    // ReverseGeocoding 함수 : 역지오코딩 (위도,경도 -> 주소,지명)
-                    // 반환값 예시
+                // ReverseGeocoding 함수 : 역지오코딩 (위도,경도 -> 주소,지명)
+                // 반환값 예시
                         /* Address[
                                 addressLines=[0:"대한민국 서귀포시 성산읍 성산 일출봉"],
                                 feature=성산 일출봉,
@@ -286,21 +233,19 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                                 phone=null,url=null,
                                 extras=null]
                          */
-                    Address addr= ReverseGeocoding(point);
+                Address addr= ReverseGeocoding(point);
 
-                    if(addr!=null){
-                        String locationName = addr.getFeatureName(); // 주소이름,
-                        String address = addr.getAddressLine(0); // 주소
+                if(addr!=null){
+                    String locationName = addr.getFeatureName(); // 주소이름,
+                    String address = addr.getAddressLine(0); // 주소
 
-                        // 지도에서 클릭한 위치에 마커 추가
-                        AddMarker(locationName,address,point);
-                    }
+                    // 지도에서 클릭한 위치에 마커 추가
+                    AddMarker(locationName,address,point);
                 }
             }
         });
     }
 
-    // ++ ===================================================
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -312,24 +257,40 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 location = locationList.get(locationList.size() - 1);
                 //location = locationList.get(0);
 
+                // 현재 위치 (위도, 경도)
                 currentPosition
                         = new LatLng(location.getLatitude(), location.getLongitude());
 
 
-                String markerTitle = getCurrentAddress(currentPosition);
-                String markerSnippet = "위도:" + String.valueOf(location.getLatitude())
-                        + " 경도:" + String.valueOf(location.getLongitude());
+                // 현재 위치 주소 가지고 역 지오코딩
+                Address addr= ReverseGeocoding(currentPosition);
+                String markerTitle = addr.getFeatureName(); // 주소이름,
+                String address = addr.getAddressLine(0); // 주소
 
-                System.out.println("onLocationResult : " + markerSnippet);
-
-
-                //현재 위치에 마커 생성하고 이동
-                setCurrentLocation(location, markerTitle, markerSnippet);
+                // 현재 위치에 마커 추가
+                setCurrentLocation(location, markerTitle, address);
 
                 mCurrentLocation = location;
             }
         }
     };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        System.out.println("onStart");
+
+        if (checkPermission()) {
+
+            System.out.println("onStart : call mFusedLocationClient.requestLocationUpdates");
+            mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+
+            if (mMap!=null)
+                mMap.setMyLocationEnabled(true);
+        }
+    }
+
 
     @Override
     protected void onStop() {
@@ -342,8 +303,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    // ++ ===================================================
 
+    // ++ ===================================================
     // 지도에서 초기 위치 설정
     public void setDefaultLocation() {
 
@@ -389,19 +350,14 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 System.out.println("startLocationUpdates : 퍼미션 안가지고 있음");
                 return;
             }
-
-
             System.out.println("startLocationUpdates : call mFusedLocationClient.requestLocationUpdates");
 
             mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 
             if (checkPermission())
                 mMap.setMyLocationEnabled(true);
-            //mMyLocationButtonView = mMapFragment.getView().findViewWithTag("GoogleMapMyLocationButton");
-            //mMyLocationButtonView.setBackgroundColor(Color.GREEN);
 
         }
-
     }
 
     // 현재 위치 주소 반환
@@ -413,7 +369,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         List<Address> addresses;
 
         try {
-
             addresses = geocoder.getFromLocation(
                     latlng.latitude,
                     latlng.longitude,
@@ -425,9 +380,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         } catch (IllegalArgumentException illegalArgumentException) {
             Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
             return "잘못된 GPS 좌표";
-
         }
-
 
         if (addresses == null || addresses.size() == 0) {
             Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
@@ -444,28 +397,29 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
     public void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
         if (currentMarker != null) currentMarker.remove();
 
-        /*
         LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(currentLatLng);
-        markerOptions.title(markerTitle);
+        //markerOptions.title(markerTitle);
+        markerOptions.title("현재 위치");
         markerOptions.snippet(markerSnippet);
         markerOptions.draggable(true);
 
         currentMarker = mMap.addMarker(markerOptions);
 
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng);
-        mMap.moveCamera(cameraUpdate);
+        // 마커 정보 표시
+        currentMarker.showInfoWindow();
 
-         */
-
+        // 마커로 카메라 이동
+        // CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng);
+        // mMap.moveCamera(cameraUpdate);
     }
 
     //여기부터는 GPS 활성화를 위한 메소드들
     private void showDialogForLocationServiceSetting() {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(Main.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(SearchLocation.this);
         builder.setTitle("위치 서비스 비활성화");
         builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n"
                 + "위치 설정을 수정하실래요?");
@@ -526,9 +480,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
 
             boolean check_result = true;
 
-
-            // 모든 퍼미션을 허용했는지 체크합니다.
-
+            // 모든 퍼미션을 허용했는지 체크
             for (int result : grandResults) {
                 if (result != PackageManager.PERMISSION_GRANTED) {
                     check_result = false;
@@ -536,20 +488,16 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 }
             }
 
-
             if ( check_result ) {
-
                 // 퍼미션을 허용했다면 위치 업데이트를 시작합니다.
                 startLocationUpdates();
             }
             else {
-                // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다.
-
+                // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료 (2 가지 경우 존재)
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
                         || ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
 
-
-                    // 사용자가 거부만 선택한 경우에는 앱을 다시 실행하여 허용을 선택하면 앱을 사용할 수 있습니다.
+                    // 사용자가 거부만 선택한 경우 : 앱을 다시 실행하여 허용을 선택하면 앱 사용 가능
                     Snackbar.make(mLayout, "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요. ",
                             Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
 
@@ -561,15 +509,11 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                     }).show();
 
                 }else {
-
-
-                    // "다시 묻지 않음"을 사용자가 체크하고 거부를 선택한 경우에는 설정(앱 정보)에서 퍼미션을 허용해야 앱을 사용할 수 있습니다.
+                    // "다시 묻지 않음"을 사용자가 체크하고 거부를 선택한 경우 : 설정(앱 정보)에서 퍼미션을 허용해야 앱 사용 가능
                     Snackbar.make(mLayout, "퍼미션이 거부되었습니다. 설정(앱 정보)에서 퍼미션을 허용해야 합니다. ",
                             Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
-
                         @Override
                         public void onClick(View view) {
-
                             finish();
                         }
                     }).show();
@@ -598,72 +542,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
     }
 
 
-    // ===================================================
-
-
-    // 메인화면 UI 핸들러
-    public void MainUIBtnHandler(){
-        // 메인화면 버튼 클릭 이벤트
-        // 계정 버튼
-        ImageButton accountButton = (ImageButton) findViewById(R.id.account_btn);
-        accountButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"계정관리 버튼", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Main.this,Account.class);
-                startActivity(intent);
-            }
-        });
-
-        // 달력 버튼
-        ImageButton calendarButton = (ImageButton) findViewById(R.id.calendar_btn);
-        calendarButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"달력 버튼", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Main.this,Calendar2.class);
-                startActivity(intent);
-            }
-        });
-
-        // 기록장 추가 버튼
-        ImageButton addButton = (ImageButton) findViewById(R.id.add_btn);
-        addButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"기록장 추가 버튼", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Main.this,AddDiary.class);
-                startActivity(intent);
-            }
-        });
-
-        // 슬라이딩 화면 기록장 추가 버튼
-        ImageButton addButton_slide = (ImageButton) findViewById(R.id.sliding_add_btn);
-        addButton_slide.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"슬라이딩 패널 기록장 추가 버튼", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Main.this,AddDiary.class);
-                startActivity(intent);
-            }
-        });
-
-        // 슬라이딩 패널 -> 누르면 다이어리 확인 창으로 넘어감
-        LinearLayout slidingPanel = (LinearLayout) findViewById(R.id.sliding_page);
-        slidingPanel.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"슬라이딩 패널 클릭", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Main.this,DiaryList.class);
-                startActivity(intent);
-            }
-        });
-    }
-
     // 검색 핸들러
     public void SearchHandler(){
-        final LinearLayout slidePage = findViewById(R.id.sliding_page); //기록장 미리보기 화면
-        final LinearLayout slideButtons = findViewById(R.id.sliding_buttonPanel); // 버튼 패널 (기록장 추가, 달력 버튼)
 
         // 검색창
         final EditText searchBox= findViewById(R.id.edit_text);
@@ -675,8 +555,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
                 switch (keyCode){
                     case KeyEvent.KEYCODE_ENTER:
-                        // 슬라이드 패널 가리기
-                        HideLayout(slidePage,slideButtons);
 
                         // 지오코딩 (주소,지명 -> 위도,경도)
                         String searchAddress =searchBox.getText().toString();
@@ -776,55 +654,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         return null;
     }
 
-    // 기록장 미리보기화면 위로 슬라이딩, 기존 버튼 숨기기
-    private void ShowLayout(LinearLayout page, final LinearLayout buttons ){
-        // 기록장 미리보기 화면 위로 슬라이딩
-        final Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
-        page.setVisibility(View.VISIBLE);
-        page.startAnimation(slideUp);
-
-        // 버튼 숨기기 (알파값 1->0)
-        final Animation btnSlideUp = AnimationUtils.loadAnimation(this, R.anim.btn_slide_up);
-        btnSlideUp.setFillAfter(true);
-        buttons.startAnimation(btnSlideUp);
-        /*
-        btnSlideUp.setAnimationListener(new Animation.AnimationListener() {
-            float startposY;
-            float endposY;
-
-            @Override
-            public void onAnimationStart(Animation animation) {
-                startposY=buttons.getY();
-                System.out.println("Start:"+startposY);
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                buttons.setY(startposY-convertDpIntoPx(300));
-                endposY=buttons.getY();
-                System.out.println("End:"+endposY);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-         */
-    }
-
-    // 기록장 미리보기화면 아래로 슬라이딩, 기존 버튼 보이게
-    private void HideLayout(LinearLayout page, LinearLayout buttons){
-        // 기록장 미리보기 화면 아래로 슬라이딩
-        final Animation slideDown = AnimationUtils.loadAnimation(this, R.anim.slide_down);
-        page.startAnimation(slideDown);
-        page.setVisibility(View.GONE); // 화면 안 보이도록 설정
-
-        // 버튼 보이게 (알파값 0->1)
-        final Animation btnSlideDown = AnimationUtils.loadAnimation(this, R.anim.btn_slide_down);
-        buttons.startAnimation(btnSlideDown);
-    }
-
     // 가상 키보드 숨기기
     private void HideKeyboard(EditText et) {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -841,9 +670,10 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         // 마커 아이콘 변경 (비트맵 이미지만 가능)
         mOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_leaf_32));
         // 마커 추가
-        mMap.addMarker(mOptions);
+        Marker marker =mMap.addMarker(mOptions);
 
         // 추가한 마커 정보 표시
         // marker.showInfoWindow();
     }
 }
+

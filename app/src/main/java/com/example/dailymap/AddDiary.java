@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,6 +34,12 @@ public class AddDiary extends AppCompatActivity {
     ImageView submit;
     ImageView[] feels = new ImageView[3];
     EditText content;
+
+    TextView place;
+    static final int REQ_ADD_CONTACT = 1 ;
+    // 선택한 장소 정보 받아오는 변수
+    String location; // 주소
+    double latitude, longitude; // 위도, 경도
 
     //Auth
     private FirebaseAuth mAuth;
@@ -97,6 +104,22 @@ public class AddDiary extends AppCompatActivity {
             }
         });
 
+        // place 지정
+        place = findViewById(R.id.editPlace);
+        place.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(),"장소 추가!!", Toast.LENGTH_SHORT).show();
+                /*
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                startActivityForResult(intent, 101);
+                */
+                Intent intent = new Intent(AddDiary.this, SearchLocation.class);
+                startActivityForResult(intent,REQ_ADD_CONTACT);
+            }
+        });
+
         //Feels
         for(int i=0;i<feels.length;i++){
             final int feelsCnt=i;
@@ -147,5 +170,25 @@ public class AddDiary extends AppCompatActivity {
                         startActivity(intent); //추가와 동시에 이동
                     }
                 });
+    }
+
+    // 장소 추가 액티비티에서 선택한 장소 정보 받아옴
+    // location : 주소, latitude: 위도, longitude 경도
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == REQ_ADD_CONTACT) {
+            if (resultCode == RESULT_OK) {
+                location = intent.getStringExtra("location");
+                latitude = intent.getDoubleExtra("latitude", 0);
+                longitude = intent.getDoubleExtra("longitude", 0);
+                LatLng latLng = new LatLng(latitude,longitude);
+
+                place = findViewById(R.id.editPlace);
+                place.setText(location);
+
+                System.out.println(latLng);
+            }
+        }
     }
 }
