@@ -19,7 +19,8 @@ android {
         versionCode 1
         versionName "1.0"
         manifestPlaceholders = [googleMapApiKey: googleMapApiKey]
-        multiDexEnabled true //Cannot fit requested classes in a single dex file (# methods: 99149 > 65536) 오류
+        multiDexEnabled true
+        //Cannot fit requested classes in a single dex file (# methods: 99149 > 65536) 오류
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,6 +51,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:16.0.5'
     implementation 'com.google.android.gms:play-services-auth:18.1.0' //Google Login
     implementation 'com.google.firebase:firebase-firestore:17.1.2' //Firestore
+    implementation 'com.google.firebase:firebase-storage:16.0.4' //Storage
 
     ///Glide :포토///
     implementation 'com.github.bumptech.glide:glide:4.11.0'

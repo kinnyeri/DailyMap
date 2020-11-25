@@ -1,11 +1,16 @@
 package com.example.dailymap;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.content.CursorLoader;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -13,12 +18,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,9 +52,12 @@ public class AddDiary extends AppCompatActivity {
     //CFS
     private FirebaseFirestore db;
     private DiaryDS newD;
-
+    //Storage
+    private FirebaseStorage storage;
+    private StorageReference storageRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_diary);
         //CFS
@@ -50,7 +65,10 @@ public class AddDiary extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
         newD = new DiaryDS(user.getEmail());
         newD.setLocation(37.26,125.27);
-        newD.setImg("no idea");
+        //newD.setImg("no idea");
+        //Storage
+        storage=FirebaseStorage.getInstance();
+        storageRef = storage.getReferenceFromUrl("gs://daily-map-d47b1.appspot.com");
 
         //date 지정
         date = (TextView) findViewById(R.id.editDate);
@@ -120,13 +138,14 @@ public class AddDiary extends AppCompatActivity {
             submit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(newD.feel!=-1){
+                    if(newD.feel!=-1 &&newD.img!=null){
                         //내용 저장
                         newD.setContent(content.getText().toString());
+                        addImgToStorage(newD.getImg());
                         addNewContent(user.getUid());
                         Toast.makeText(getApplicationContext(),"Submit OK", Toast.LENGTH_SHORT).show();
                     } else{
-                        Toast.makeText(getApplicationContext(),"기분을 선택해주세요.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"기분이나 사진도 선택해주세요.", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -137,7 +156,7 @@ public class AddDiary extends AppCompatActivity {
         //날짜별로 저장? 일단 random key 상태..
         newD.display(AddDiary.this);
         db.collection("DiaryGroupList").document(dgKey)
-                .collection("diaryList")
+                .collection("diaryList") //랜덤 key
                 .add(newD)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -147,5 +166,49 @@ public class AddDiary extends AppCompatActivity {
                         startActivity(intent); //추가와 동시에 이동
                     }
                 });
+    }
+    private  void addImgToStorage(String stringUri){
+        Uri file = Uri.fromFile(new File(stringUri));
+        Toast.makeText(AddDiary.this,stringUri,Toast.LENGTH_SHORT).show();
+
+        StorageReference ref = storageRef.child("images/"+file.getLastPathSegment());
+        //UploadTask uploadTask = ref.putFile(file);
+        // Register observers to listen for when the download is done or if it fails
+        ref.putFile(file).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Toast.makeText(AddDiary.this,"fail uploading imgfile",Toast.LENGTH_SHORT).show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                Toast.makeText(AddDiary.this,"SUCCESS uploading imgfile",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Uri selectedImageUri;
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                selectedImageUri = data.getData();
+                Glide.with(getApplicationContext()).load(selectedImageUri).into(imgContent);
+                System.out.println("find me ---------------------------------------------------------------");
+
+                System.out.println(selectedImageUri.toString());
+                System.out.println(getPath(selectedImageUri));
+                newD.setImg(getPath(selectedImageUri));
+        }
+    }
+    public String getPath(Uri uri){
+        String [] proj = {MediaStore.Images.Media.DATA};
+        CursorLoader cursorLoader = new CursorLoader(AddDiary.this,uri,proj,null,null,null);
+        Cursor cursor=cursorLoader.loadInBackground();
+        int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return  cursor.getString(index);
     }
 }

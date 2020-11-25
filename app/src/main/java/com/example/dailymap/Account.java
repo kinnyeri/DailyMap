@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class Account extends AppCompatActivity {
 
-    TextView name,logout;
+    TextView name,logout,dgManager;
     private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +25,7 @@ public class Account extends AppCompatActivity {
 
         name=findViewById(R.id.nameText);
         logout=findViewById(R.id.googleSignOut);
+        dgManager=findViewById(R.id.diaryGroupManager);
 
         GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
         if(signInAccount!=null){
@@ -36,6 +37,13 @@ public class Account extends AppCompatActivity {
                 Toast.makeText(Account.this,"SignOut Start",Toast.LENGTH_SHORT).show();
                 FirebaseAuth.getInstance().signOut(); //Firebase logout
                 Intent intent = new Intent(getApplicationContext(),SignIn.class);
+                startActivity(intent);
+            }
+        });
+        dgManager.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Account.this,DiaryGroupManager.class);
                 startActivity(intent);
             }
         });
