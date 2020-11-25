@@ -51,7 +51,7 @@ dependencies {
     ///FireBase///
     implementation 'com.google.firebase:firebase-auth:16.0.5'
     implementation 'com.google.android.gms:play-services-auth:18.1.0' //Google Login
-    implementation 'com.google.firebase:firebase-firestore:17.1.2' //Firestore
+    implementation 'com.google.firebase:firebase-firestore:17.1.2' //Firestore 17.1.2
     implementation 'com.google.firebase:firebase-storage:16.0.4' //Storage
 
     ///Glide :포토///
