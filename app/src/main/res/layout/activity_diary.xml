@@ -5,16 +5,16 @@
     android:id="@+id/ScrollView1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Diary">
+    tools:context=".Diary"
+    android:background="@color/mainColor">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/mainColor">
+        android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/img"
+            android:id="@+id/diaryImg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitCenter"
@@ -22,7 +22,6 @@
             android:src="@drawable/jeju00" />
 
         <LinearLayout
-            android:id="@+id/diaryContents"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -58,7 +57,7 @@
                 android:padding="30px"
                 android:textColor="#ECE6CC"/>
             <TextView
-                android:id="@+id/diary"
+                android:id="@+id/diaryContent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="30px"

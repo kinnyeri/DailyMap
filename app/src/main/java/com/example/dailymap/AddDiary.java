@@ -90,13 +90,22 @@ public class AddDiary extends AppCompatActivity {
 
         cal=Calendar.getInstance();
         year =cal.get(Calendar.YEAR); month = cal.get(Calendar.MONTH)+1; day = cal.get(Calendar.DATE);
-        date.setText(year+"/"+month+"/"+day);
+        if(month<10){
+            date.setText(year+"/0"+month+"/"+day);
+        } else{
+            date.setText(year+"/"+month+"/"+day);
+        }
+
 
         callbackMethod = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int tyear, int tmonth, int tday) {
                 year = tyear; month=tmonth+1; day=tday;
-                date.setText(year+"/"+month+"/"+day);
+                if(month<10){
+                    date.setText(year+"/0"+month+"/"+day);
+                } else{
+                    date.setText(year+"/"+month+"/"+day);
+                }
             }
         };
 
@@ -270,7 +279,7 @@ public class AddDiary extends AppCompatActivity {
             SimpleDateFormat dateFormat=new SimpleDateFormat("yyMMddmmss");
             String date = dateFormat.format(new Date());
             newD.setImg("dm"+user.getUid()+date);//이미지 이름 저장
-            Toast.makeText(AddDiary.this,"img uri into tmpUri",Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddDiary.this,"img uri into tmpUri ",Toast.LENGTH_SHORT).show();
         }
     }
 }

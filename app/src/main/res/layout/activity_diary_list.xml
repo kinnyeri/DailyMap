@@ -16,6 +16,10 @@
         android:background="@color/mainColor"
         android:textColor="@color/textColor1"
         android:layout_weight="0"/>
+    <ImageView
+        android:id="@+id/temp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
     <GridView
         android:id="@+id/gridList"
         android:layout_width="match_parent"
