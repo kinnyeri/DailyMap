@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/DefaultTheme">
-        <activity android:name=".SearchLocation"></activity>
+        <activity android:name=".AddDiaryGroup"></activity>
+        <activity android:name=".SearchLocation" />
         <activity android:name=".Account" />
         <activity android:name=".SignIn" />
         <activity android:name=".DiaryList" />

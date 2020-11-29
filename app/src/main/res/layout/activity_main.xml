@@ -55,6 +55,14 @@
         android:orientation="vertical">
 
         <ImageButton
+            android:id="@+id/test_group"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/bg_round"
+            android:src ="@drawable/ic_baseline_add_24"/>
+
+        <ImageButton
             android:id="@+id/calendar_btn"
             android:layout_width="60dp"
             android:layout_height="60dp"

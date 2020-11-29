@@ -658,6 +658,20 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 startActivity(intent);
             }
         });
+
+        //+========================================================
+        // 공유 다이어리 추가 테스트
+        ImageButton addGroupDiary = (ImageButton) findViewById(R.id.test_group);
+        addGroupDiary.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Toast.makeText(getApplicationContext(),"공유 다이어리 추가 버튼", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Main.this,AddDiaryGroup.class);
+                startActivity(intent);
+            }
+        });
+        //+=========================================================
+
     }
 
     // 검색 핸들러

@@ -15,6 +15,11 @@ public class DiaryGroup {
         userList.add(user);
     }
 
+    public DiaryGroup(String name,Vector<String> user){
+        this.name=name;
+        userList= (Vector<String>) user.clone();
+    }
+
     public String getName() {
         return name;
     }
