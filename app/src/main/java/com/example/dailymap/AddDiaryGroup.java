@@ -47,10 +47,15 @@ public class AddDiaryGroup extends AppCompatActivity {
 
     private FirebaseUser user;
 
+    //DiaryGroup 정보 유지
+    String curDG;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_diary_group);
+        //DiaryGroup 정보 유지
+        curDG=getIntent().getStringExtra("curDG");
 
         db = FirebaseFirestore.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -116,21 +121,26 @@ public class AddDiaryGroup extends AppCompatActivity {
                 } else{
                     Toast.makeText(getApplicationContext(),"이메일을 적어주세요", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
+        Toast.makeText(AddDiaryGroup.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
+
     }
 
-    private void addNewDiaryGroup(String uid, String name){
+
+    private void addNewDiaryGroup(String uid, final String name){
         //String shareKey= "share"+uid+"000";
         // 랜덤으로 생기게
         db.collection("DiaryGroupList")
-                .document()
-                .set(new DiaryGroup(name,emailList))
+                .document(name)
+                .set(new DiaryGroup(emailList))
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(AddDiaryGroup.this,"DiaryGroup Add SUCC",Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getApplicationContext(),Main.class);
+                        intent.putExtra("curDG",name);
                         startActivity(intent); //추가와 동시에 메인페이지로 이동
                     }
                 });

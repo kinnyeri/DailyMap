@@ -88,11 +88,14 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
 
     private View mLayout; // Snackbar 사용하기 위해서는 View가 필요
     // ======================================
+    //DiaryGroup 정보 유지
+    String curDG;
+    FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
 
     @Override //Auth 확인
     protected void onStart() {
         super.onStart();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //에러 남 > 로그아웃 안됨
+        //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //에러 남 > 로그아웃 안됨
         Toast.makeText(Main.this,"start",Toast.LENGTH_LONG).show();
         if(user!=null){ //login 중
             Toast.makeText(Main.this,user.getDisplayName(),Toast.LENGTH_SHORT).show();
@@ -115,6 +118,11 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             //mMyLocationButtonView.setBackgroundColor(Color.GREEN);
         }
         // ==================================================
+        //다이어리 정보 유지
+        curDG = getIntent().getStringExtra("curDG"); //signin에서 받아온거 사용
+        Toast.makeText(Main.this,"1현재 : "+curDG,Toast.LENGTH_LONG).show();
+        if(curDG==null) curDG = user.getDisplayName()+"'s diary";
+        Toast.makeText(Main.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -142,6 +150,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 .findFragmentById(R.id.map);
         mapView = mapFragment.getView();
         mapFragment.getMapAsync(this);
+
+
     }
 
     @Override
@@ -611,6 +621,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             public void onClick(View view){
                 Toast.makeText(getApplicationContext(),"계정관리 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,Account.class);
+                //다이어리 정보 유지
+                intent.putExtra("curDG",curDG);
                 startActivity(intent);
             }
         });
@@ -622,6 +634,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             public void onClick(View view){
                 Toast.makeText(getApplicationContext(),"달력 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,Calendar2.class);
+                //다이어리 정보 유지
+                intent.putExtra("curDG",curDG);
                 startActivity(intent);
             }
         });
@@ -633,6 +647,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             public void onClick(View view){
                 Toast.makeText(getApplicationContext(),"기록장 추가 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,AddDiary.class);
+                //다이어리 정보 유지
+                intent.putExtra("curDG",curDG);
                 startActivity(intent);
             }
         });
@@ -644,6 +660,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             public void onClick(View view){
                 Toast.makeText(getApplicationContext(),"슬라이딩 패널 기록장 추가 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,AddDiary.class);
+                //다이어리 정보 유지
+                intent.putExtra("curDG",curDG);
                 startActivity(intent);
             }
         });
@@ -655,6 +673,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             public void onClick(View view){
                 Toast.makeText(getApplicationContext(),"슬라이딩 패널 클릭", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,DiaryList.class);
+                //다이어리 정보 유지
+                intent.putExtra("curDG",curDG);
                 startActivity(intent);
             }
         });
@@ -667,6 +687,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             public void onClick(View view){
                 Toast.makeText(getApplicationContext(),"공유 다이어리 추가 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,AddDiaryGroup.class);
+                //다이어리 정보 유지
+                intent.putExtra("curDG",curDG);
                 startActivity(intent);
             }
         });

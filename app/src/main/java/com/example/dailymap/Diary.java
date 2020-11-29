@@ -41,10 +41,16 @@ public class Diary extends AppCompatActivity {
     //ST
     private FirebaseStorage storage;
     private StorageReference storageRef;
+    //DiaryGroup 정보 유지
+    String curDG;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary);
+        //DiaryGroup 정보 유지
+        curDG=getIntent().getStringExtra("curDG");
+
         //CST
         storage= FirebaseStorage.getInstance("gs://daily-map-d47b1.appspot.com");
         storageRef = storage.getReference();
@@ -58,8 +64,11 @@ public class Diary extends AppCompatActivity {
 
         //Intent
         Intent intent = getIntent();
-        loc.setText(intent.getExtras().getString("locationX")+", "+intent.getExtras().getString("locationY").toString());
-        switch (intent.getExtras().getString("feel")){
+        String locX = intent.getExtras().getString("locationX");
+        String locY = intent.getExtras().getString("locationY");
+        String feels = intent.getExtras().getString("feel");
+        loc.setText(locX+", "+locY);
+        switch (feels){
             case "0":
                 feel.setImageResource(feelThumbs[0]); break;
             case "1":
@@ -72,9 +81,7 @@ public class Diary extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance(); //Init Firestore
         //이미지 올리기
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String dgKey = user.getUid()+"000";
-        storageRef.child(dgKey+"/"+intent.getExtras().getString("img"))
+        storageRef.child(curDG+"/"+intent.getExtras().getString("img"))
                 .getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             ImageView tmpIV=img;
             @Override
@@ -91,6 +98,6 @@ public class Diary extends AppCompatActivity {
                 Toast.makeText(Diary.this,"iv failed !@@@",Toast.LENGTH_LONG).show();
             }
         });
-
+        Toast.makeText(Diary.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
     }
 }

@@ -52,24 +52,26 @@ public class DiaryList extends AppCompatActivity {
     //CST
     private FirebaseStorage storage;
     private StorageReference storageRef;
-    String dgKey;
+    //DiaryGroup 정보 유지
+    String curDG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary_list);
+        //DiaryGroup 정보 유지
+        curDG = getIntent().getStringExtra("curDG");
 
         System.out.println("onCreate--------------------------------------");
         strImg = new Vector<Map<String,Object>>();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        dgKey = user.getUid()+"000";
         db = FirebaseFirestore.getInstance(); //Init Firestore
         Toast.makeText(DiaryList.this,strImg.size()+" ?",Toast.LENGTH_SHORT).show();
 
         gv = (GridView) findViewById(R.id.gridList);
-        db.collection("DiaryGroupList").document(dgKey)
+        db.collection("DiaryGroupList").document(curDG)
                 .collection("diaryList")
                 .whereEqualTo("feel",1)
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -97,6 +99,8 @@ public class DiaryList extends AppCompatActivity {
 
         metrics= new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Toast.makeText(DiaryList.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
+
     }
 
     public class ImgAdapter extends BaseAdapter {
@@ -130,7 +134,7 @@ public class DiaryList extends AppCompatActivity {
                 imageView =(ImageView)convertView;
             }
 
-            storageRef.child(dgKey+"/"+listItem.get("img").toString())
+            storageRef.child(curDG+"/"+listItem.get("img").toString())
                     .getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         ImageView tmpIV=imageView;
                 @Override
@@ -160,6 +164,7 @@ public class DiaryList extends AppCompatActivity {
                     intent.putExtra("img",tmpList.get("img").toString());
                     intent.putExtra("date",tmpList.get("date").toString());
                     intent.putExtra("content",tmpList.get("content").toString());
+                    intent.putExtra("curDG",curDG);
                     startActivity(intent);
                 }
             });

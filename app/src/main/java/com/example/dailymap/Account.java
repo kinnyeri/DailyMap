@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,10 @@ public class Account extends AppCompatActivity {
     Spinner spinner;
     private FirebaseAuth mAuth;
     FirebaseFirestore db;
+    //DiaryGroup 정보 유지
+    String curDG;
+    ImageView listSubmit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,15 +42,18 @@ public class Account extends AppCompatActivity {
         logout=findViewById(R.id.googleSignOut);
         dgManager=findViewById(R.id.diaryGroupManager);
         spinner=findViewById(R.id.spinner);
-        db = FirebaseFirestore.getInstance();
+        listSubmit=findViewById(R.id.listSubmit);
 
-        //spinner.setAdapter(new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_spinner_dropdown_item));
+        db = FirebaseFirestore.getInstance();
+        //DiaryGroup 정보 유지
+        curDG = getIntent().getStringExtra("curDG"); //main 받아온거 사용
 
         GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
         if(signInAccount!=null){
             name.setText(signInAccount.getDisplayName());
         }
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String uid = FirebaseAuth.getInstance().getUid();
+
         db.collection("UserList").document(uid)
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     String list[];
@@ -55,9 +63,8 @@ public class Account extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if(document.exists()){
                         String tmp = document.getData().get("diaryGroupList").toString();
-                        tmp = tmp.replace("[","").replace("]","").replace(" ","");
+                        tmp = tmp.replace("[","").replace("]","");
                         list =tmp.split(",");
-                        Toast.makeText(Account.this,tmp,Toast.LENGTH_LONG).show();
                     }else{
                         Toast.makeText(Account.this,"no docs",Toast.LENGTH_LONG).show();
                     }
@@ -72,8 +79,10 @@ public class Account extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 String selected = adapterView.getItemAtPosition(i).toString();
-                Toast.makeText(Account.this,selected,Toast.LENGTH_LONG).show();
-                //다이어리 정보 변경해서 보내기
+                Toast.makeText(Account.this,i+"",Toast.LENGTH_LONG).show();
+                curDG = selected;
+                curDG= curDG.replaceFirst(" ","");
+                //startActivity(intent);
             }
 
             @Override
@@ -81,6 +90,7 @@ public class Account extends AppCompatActivity {
 
             }
         });
+
         logout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -94,8 +104,19 @@ public class Account extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Account.this,DiaryGroupManager.class);
+                intent.putExtra("curDG",curDG);
                 startActivity(intent);
             }
         });
+        listSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Account.this,Main.class);
+                intent.putExtra("curDG",curDG);
+                startActivity(intent);
+            }
+        });
+        Toast.makeText(Account.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
+
     }
 }

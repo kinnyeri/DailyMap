@@ -24,8 +24,8 @@ public class DiaryDS {
         this.locationY=y;
     }
 
-    public void setDate(int y,int m,int d) {
-        this.date = y+""+m+""+d;
+    public void setDate(String y,String m,String d) {
+        this.date = y+m+d;
     }
 
     public void setImg(String img) {

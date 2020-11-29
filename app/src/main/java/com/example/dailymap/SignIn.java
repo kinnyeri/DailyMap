@@ -66,6 +66,7 @@ public class SignIn extends AppCompatActivity {
                 signIn();
             }
         });
+
     }
    private void createRequest(){
         //Configure Google Sign In
@@ -111,10 +112,12 @@ public class SignIn extends AppCompatActivity {
                             Toast.makeText(SignIn.this, "success", Toast.LENGTH_SHORT).show();
 
                             //Database에 저장
-                            addNewUser(new User(user.getDisplayName(),user.getEmail()),user.getUid());
+                            String key = user.getDisplayName()+"'s diary"; //다이어리 이름으로 document 아이디 설정
+                            addNewUser(new User(user.getDisplayName(),user.getEmail()),key,user.getUid());
 
                             //UI 업데이트
                             Intent intent = new Intent(getApplicationContext(),Main.class);
+                            intent.putExtra("curDG",key);
                             startActivity(intent);
                             //updateUI(user);
                         } else {
@@ -124,8 +127,7 @@ public class SignIn extends AppCompatActivity {
                     }
                 });
     }
-    private void addNewUser(User tmp,String uid){
-        String key = uid+"000"; // 개인 다이어리 생성 개수 : 2^3 8개
+    private void addNewUser(User tmp,String key,String uid){
         //FST
         tmp.diaryGroupList.add(key);
         db.collection("UserList").document(uid)
@@ -136,8 +138,8 @@ public class SignIn extends AppCompatActivity {
                         Toast.makeText(SignIn.this,"USER SUCC",Toast.LENGTH_SHORT).show();
                     }
                 });
-        db.collection("DiaryGroupList").document(key)
-                .set(new DiaryGroup(tmp.name+"'s diary",tmp.email))
+        db.collection("DiaryGroupList").document(tmp.name+"'s diary")
+                .set(new DiaryGroup(tmp.email))
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void v) {

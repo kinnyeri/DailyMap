@@ -29,11 +29,14 @@ public class Calendar2 extends AppCompatActivity {
     private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
     Cursor cursor;
     MaterialCalendarView materialCalendarView;
+    //DiaryGroup 정보 유지
+    String curDG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
+        curDG=getIntent().getStringExtra("curDG"); // 이동이 있으면 intent에 붙여서 보내줘야함
 
         materialCalendarView = (MaterialCalendarView)findViewById(R.id.calendarView);
 
@@ -73,6 +76,8 @@ public class Calendar2 extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), shot_Day , Toast.LENGTH_SHORT).show();
             }
         });
+        Toast.makeText(Calendar2.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
+
     }
 
     private class ApiSimulator extends AsyncTask<Void, Void, List<CalendarDay>> {

@@ -70,11 +70,16 @@ public class AddDiary extends AppCompatActivity {
     private StorageReference storageRef;
     static final int IMG_GETIN = 101 ;
     Uri tmpUri;
+    //DiaryGroup 정보 유지
+    String curDG;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_diary);
+        //DiaryGroup 정보 유지
+        curDG = getIntent().getStringExtra("curDG"); //main 받아온거 사용
+
         //CFS
         db = FirebaseFirestore.getInstance(); //Init Firestore
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -101,11 +106,7 @@ public class AddDiary extends AppCompatActivity {
             @Override
             public void onDateSet(DatePicker view, int tyear, int tmonth, int tday) {
                 year = tyear; month=tmonth+1; day=tday;
-                if(month<10){
-                    date.setText(year+"/0"+month+"/"+day);
-                } else{
-                    date.setText(year+"/"+month+"/"+day);
-                }
+                date.setText(year+"/"+month+"/"+day);
             }
         };
 
@@ -186,10 +187,13 @@ public class AddDiary extends AppCompatActivity {
                 public void onClick(View view) {
                     if(newD.feel!=-1 &&newD.img!=null){
                         //내용 저장
-                        newD.setDate(year,month,day); // 날짜 저장
+                        String[] tmp={month+"",day+""};
+                        if(tmp[0].length()<2) tmp[0]="0"+tmp[0];
+                        if(tmp[1].length()<2) tmp[1]="0"+tmp[1];
+                        newD.setDate(year+"",tmp[0],tmp[1]); // 날짜 저장
                         newD.setContent(content.getText().toString()); //내용 저장
                         addImgToStorage(tmpUri,newD.getImg()); //이미지 저장소에 올리기
-                        addNewContent(user.getUid()); //기록 저장
+                        addNewContent(); //기록 저장
                         Toast.makeText(getApplicationContext(),"Submit OK", Toast.LENGTH_SHORT).show();
                     } else{
                         Toast.makeText(getApplicationContext(),"기분이나 사진도 선택해주세요.", Toast.LENGTH_SHORT).show();
@@ -197,19 +201,19 @@ public class AddDiary extends AppCompatActivity {
                 }
             });
         }
+        Toast.makeText(AddDiary.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
     }
-    private void addNewContent(String uid){
-        String dgKey = uid+"000"; // 어떤 DiaryGroup에다가 저장
-        //날짜별로 저장? 일단 random key 상태..
+    private void addNewContent(){
         //newD.display(AddDiary.this);
-        db.collection("DiaryGroupList").document(dgKey)
-                .collection("diaryList") //랜덤 key
+        db.collection("DiaryGroupList").document(curDG)
+                .collection("diaryList")
                 .add(newD)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Toast.makeText(AddDiary.this,"Diary Add SUCC",Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getApplicationContext(),Main.class);
+                        intent.putExtra("curDG",curDG);
                         startActivity(intent); //추가와 동시에 메인페이지로 이동
                     }
                 });
@@ -217,8 +221,8 @@ public class AddDiary extends AppCompatActivity {
     private  void addImgToStorage(Uri tmpUri,String imgName){
         Uri file = Uri.fromFile(new File(getPath(tmpUri)));
         Toast.makeText(AddDiary.this,getPath(tmpUri),Toast.LENGTH_SHORT).show();
-        //이미지 경로 : 다이어리 그룹 key /
-        StorageReference ref = storageRef.child(user.getUid()+"000").child(imgName);
+        //이미지 경로 : curDG
+        StorageReference ref = storageRef.child(curDG).child(imgName);
 
         Toast.makeText(AddDiary.this,file.getLastPathSegment(),Toast.LENGTH_SHORT).show();
 

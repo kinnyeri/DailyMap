@@ -50,19 +50,24 @@ public class DiaryGroupManager extends AppCompatActivity {
     String userListEmail[];
     Vector<String> userListName;
     ArrayList<HashMap<String,String>> userListData;
+    //DiaryGroup 정보 유지
+    String curDG;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary_group_manager);
+        //다이어리 정보 유지
+        curDG = getIntent().getStringExtra("curDG");
 
         userListView=findViewById(R.id.userList);
         manageOk=findViewById(R.id.manageOk);
         userListName = new Vector<String>();
         userListData = new ArrayList<>();
 
-        dgKey = FirebaseAuth.getInstance().getCurrentUser().getUid()+"000";
+        //dgKey = FirebaseAuth.getInstance().getCurrentUser().getUid()+"000";
         db = FirebaseFirestore.getInstance();
-        db.collection("DiaryGroupList").document(dgKey)
+        db.collection("DiaryGroupList").document(curDG)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     String list[];
