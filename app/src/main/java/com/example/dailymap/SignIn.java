@@ -56,19 +56,6 @@ public class SignIn extends AppCompatActivity {
         setContentView(R.layout.activity_sign_in);
         //CFS
         db = FirebaseFirestore.getInstance(); //Init Firestore
-//        Map<String, Object> user = new HashMap<>();
-//        user.put("first", "Ada");
-//        user.put("last", "Lovelace");
-//        user.put("born", 1815);
-//
-//        db.collection("test")
-//                .add(user)
-//                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                    @Override
-//                    public void onSuccess(DocumentReference documentReference) {
-//                        Toast.makeText(SignIn.this,"CFS SUCC",Toast.LENGTH_SHORT).show();
-//                    }
-//                });
 
         mAuth=FirebaseAuth.getInstance(); //init Auth
         createRequest(); //init GoogleAuth

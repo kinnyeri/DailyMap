@@ -3,21 +3,6 @@ package com.example.dailymap;
 import android.content.Context;
 import android.widget.Toast;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
-
-//class DateDS{
-//    public int year;
-//    public int month;
-//    public int day;
-//
-//    public DateDS(int y,int m,int d){
-//        year=y;
-//        month=m;
-//        day=d;
-//    }
-//}
 public class DiaryDS {
     public double locationX; //x,y 좌표 저장
     public double locationY; //x,y 좌표 저장

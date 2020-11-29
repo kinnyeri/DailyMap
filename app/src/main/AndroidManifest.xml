@@ -19,6 +19,7 @@
         <activity android:name=".SignIn" />
         <activity android:name=".DiaryList" />
         <activity android:name=".AddDiary" />
+        <activity android:name=".DiaryGroupManager" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

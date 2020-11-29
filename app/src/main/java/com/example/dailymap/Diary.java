@@ -92,54 +92,5 @@ public class Diary extends AppCompatActivity {
             }
         });
 
-//        db.collection("DiaryGroupList").document(dgKey)
-//                .collection("diaryList")
-//                .whereEqualTo("feel", 0)
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            for (QueryDocumentSnapshot document : task.getResult()) {
-//                                //DiaryDS tmp = document.getData();
-//                                //String tmp = document.getData().;
-//                                Map<String,Object> tmp = document.getData();
-//                                String writter = tmp.get("writter").toString();
-//                                String date = tmp.get("date").toString();
-//                                loc.setText(tmp.get("locationX").toString()+", "+tmp.get("locationY").toString());
-//                                date= date.substring(0,4)+"/"+date.substring(4,6)+"/"+date.substring(6,8); //완벽하다
-//                                Toast.makeText(Diary.this,date,Toast.LENGTH_SHORT).show();
-//                            }
-//                        } else {
-//                            Toast.makeText(Diary.this,"Failed",Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                });
-//        db.collection("DiaryGroupList").document(dgKey).collection("diaryList")
-//                .document()
-//                .get()
-//                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                        Map<String, Object> forms = documentSnapshot.get();
-//                        for (Map.Entry<String, Object> form: forms.entrySet()) {
-//                            String key = (String) form.getKey();
-//                            Map<Object, Object> values = (Map<Object, Object>)form.getValue();
-//                            String name = (String) values.get("writter");
-//                            Toast.makeText(Diary.this,document.getData().toString(),Toast.LENGTH_SHORT).show();
-//
-//                        }
-//                    }
-//                });
-//        DocumentReference docRef = db.collection("DiaryGroupList").document("dgKey")
-//                .collection("diaryList").document(dgKey+"00");
-//        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                DiaryDS tmp = documentSnapshot.toObject(DiaryDS.class);
-//                Toast.makeText(Diary.this,tmp.getContent().toString(),Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
     }
 }
