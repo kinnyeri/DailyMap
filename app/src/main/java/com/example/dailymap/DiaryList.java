@@ -63,6 +63,7 @@ public class DiaryList extends AppCompatActivity {
         strImg = new Vector<Map<String,Object>>();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         dgKey = user.getUid()+"000";
         db = FirebaseFirestore.getInstance(); //Init Firestore
         Toast.makeText(DiaryList.this,strImg.size()+" ?",Toast.LENGTH_SHORT).show();
@@ -70,7 +71,7 @@ public class DiaryList extends AppCompatActivity {
         gv = (GridView) findViewById(R.id.gridList);
         db.collection("DiaryGroupList").document(dgKey)
                 .collection("diaryList")
-                .whereEqualTo("feel",0)
+                .whereEqualTo("feel",1)
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     ArrayList<Map<String,Object>> imgLists = new ArrayList<Map<String, Object>>();
                     @Override
@@ -146,10 +147,7 @@ public class DiaryList extends AppCompatActivity {
                     Toast.makeText(DiaryList.this,"iv failed !!!!!!!!!!!!!!",Toast.LENGTH_LONG).show();
                 }
             });
-//            Glide.with(context)
-//                    .load(thumbnails[pos])
-//                    .into(imageView);
-
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setOnClickListener(new View.OnClickListener() {
                 Map<String,Object> tmpList = listItem;
                 @Override
