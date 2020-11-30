@@ -32,6 +32,12 @@ public class Account extends AppCompatActivity {
     //DiaryGroup 정보 유지
     String curDG;
     ImageView listSubmit;
+    boolean changed = false;
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //DiaryGroup 정보 유지
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +51,7 @@ public class Account extends AppCompatActivity {
         listSubmit=findViewById(R.id.listSubmit);
 
         db = FirebaseFirestore.getInstance();
+
         //DiaryGroup 정보 유지
         curDG = getIntent().getStringExtra("curDG"); //main 받아온거 사용
 
@@ -65,6 +72,9 @@ public class Account extends AppCompatActivity {
                         String tmp = document.getData().get("diaryGroupList").toString();
                         tmp = tmp.replace("[","").replace("]","");
                         list =tmp.split(",");
+                        for(int i=1;i<list.length;i++){
+                            list[i]=list[i].replaceFirst(" ","");
+                        }
                     }else{
                         Toast.makeText(Account.this,"no docs",Toast.LENGTH_LONG).show();
                     }
@@ -72,16 +82,18 @@ public class Account extends AppCompatActivity {
                     Toast.makeText(Account.this,"no tasks",Toast.LENGTH_LONG).show();
 
                 }
-                spinner.setAdapter(new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_spinner_dropdown_item,list));
+                ArrayAdapter spinAdapter = new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_spinner_dropdown_item,list);
+                spinner.setAdapter(spinAdapter);
+                int pos = spinAdapter.getPosition(curDG);
+                spinner.setSelection(pos);
             }
         });
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 String selected = adapterView.getItemAtPosition(i).toString();
-                Toast.makeText(Account.this,i+"",Toast.LENGTH_LONG).show();
                 curDG = selected;
-                curDG= curDG.replaceFirst(" ","");
+                //curDG= curDG.replaceFirst(" ","");
                 //startActivity(intent);
             }
 
@@ -105,6 +117,7 @@ public class Account extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(Account.this,DiaryGroupManager.class);
                 intent.putExtra("curDG",curDG);
+                System.out.println("dgmanager++++++++++++++++++++++++++++++++++"+curDG);
                 startActivity(intent);
             }
         });
@@ -114,6 +127,7 @@ public class Account extends AppCompatActivity {
                 Intent intent = new Intent(Account.this,Main.class);
                 intent.putExtra("curDG",curDG);
                 startActivity(intent);
+                finish();
             }
         });
         Toast.makeText(Account.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
