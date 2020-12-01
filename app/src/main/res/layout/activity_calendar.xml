@@ -35,6 +35,10 @@
         android:background="@drawable/bg_round"
         android:src ="@drawable/ic_baseline_add_24"/>
 
+    <TextView
+        android:id="@+id/textViewNo"
+        android:layout_width="100dp"
+        android:layout_height="30dp"/>
 
 
 </LinearLayout>

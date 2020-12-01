@@ -21,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -39,8 +38,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class AddDiary extends AppCompatActivity {
     DatePickerDialog.OnDateSetListener callbackMethod;
@@ -110,6 +107,7 @@ public class AddDiary extends AppCompatActivity {
             }
         };
 
+
         date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,8 +116,12 @@ public class AddDiary extends AppCompatActivity {
                 dialog.getDatePicker().setCalendarViewShown(false);
                 dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                 dialog.show();
+
+
             }
         });
+
+
 
         //View 할당
         imgContent = (ImageView)findViewById(R.id.editImg);
@@ -198,6 +200,15 @@ public class AddDiary extends AppCompatActivity {
                     } else{
                         Toast.makeText(getApplicationContext(),"기분이나 사진도 선택해주세요.", Toast.LENGTH_SHORT).show();
                     }
+
+                    Intent intent = new Intent(AddDiary.this, Calendar2.class);
+                    date = (TextView) findViewById(R.id.editDate);
+                    intent.putExtra("year", Integer.parseInt(String.valueOf(year)));
+                    intent.putExtra("month", Integer.parseInt(String.valueOf(month)));
+                    intent.putExtra("day", Integer.parseInt(String.valueOf(day)));
+
+                    setResult(RESULT_OK,intent);
+                    finish();
                 }
             });
         }
