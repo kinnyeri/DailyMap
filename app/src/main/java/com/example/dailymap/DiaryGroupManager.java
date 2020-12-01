@@ -67,6 +67,8 @@ public class DiaryGroupManager extends AppCompatActivity {
 
         //dgKey = FirebaseAuth.getInstance().getCurrentUser().getUid()+"000";
         db = FirebaseFirestore.getInstance();
+        Toast.makeText(this,"현재 "+curDG,Toast.LENGTH_SHORT).show();
+        System.out.println(curDG+"============================");
         db.collection("DiaryGroupList").document(curDG)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -82,6 +84,7 @@ public class DiaryGroupManager extends AppCompatActivity {
                                 Toast.makeText(DiaryGroupManager.this,list.length+"",Toast.LENGTH_LONG).show();
                             } else{
                                 Toast.makeText(DiaryGroupManager.this,"no docs",Toast.LENGTH_LONG).show();
+                                list[0]="error";
                             }
                         } else{
                             Toast.makeText(DiaryGroupManager.this,"Task has nothing",Toast.LENGTH_LONG).show();

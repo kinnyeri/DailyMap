@@ -15,12 +15,17 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.internal.$Gson$Preconditions;
 
 import java.util.ArrayList;
@@ -116,7 +121,8 @@ public class AddDiaryGroup extends AppCompatActivity {
 
                     // @@@@@@@@ 내용 저장 @@@@@@@@@
                     addNewDiaryGroup(user.getUid(), getName);
-
+                    // @@사용자 공유 다이어리 목록 업데이트
+                    updateDGList(user.getUid(), getName);
                     Toast.makeText(getApplicationContext(),"Submit OK", Toast.LENGTH_SHORT).show();
                 } else{
                     Toast.makeText(getApplicationContext(),"이메일을 적어주세요", Toast.LENGTH_SHORT).show();
@@ -145,7 +151,23 @@ public class AddDiaryGroup extends AppCompatActivity {
                     }
                 });
     }
-
+    private void updateDGList(String uid,final String name) {
+        for (int i = 0; i < emailList.size(); i++) {
+            db.collection("UserList").whereEqualTo("email", emailList.get(i))
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                document.getReference().update("diaryGroupList", FieldValue.arrayUnion(name));
+                                System.out.println("++++"+document.getData().get("email").toString());
+                            }
+                        }
+                    }
+                });
+        }
+    }
     // 가상 키보드 숨기기
     private void HideKeyboard(EditText et) {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);

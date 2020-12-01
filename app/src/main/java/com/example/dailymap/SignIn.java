@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -117,8 +118,11 @@ public class SignIn extends AppCompatActivity {
 
                             //UI 업데이트
                             Intent intent = new Intent(getApplicationContext(),Main.class);
+
+
                             intent.putExtra("curDG",key);
                             startActivity(intent);
+                            finish();
                             //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user
@@ -127,24 +131,45 @@ public class SignIn extends AppCompatActivity {
                     }
                 });
     }
-    private void addNewUser(User tmp,String key,String uid){
+    private void addNewUser(final User tmp,final String key,String uid){
         //FST
         tmp.diaryGroupList.add(key);
-        db.collection("UserList").document(uid)
-                .set(tmp)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+
+        db.collection("UserList")
+                .document(uid)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onSuccess(Void v) {
-                        Toast.makeText(SignIn.this,"USER SUCC",Toast.LENGTH_SHORT).show();
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot document = task.getResult();
+                        if(!document.exists()){
+                            document.getReference().set(tmp);
+                            Toast.makeText(SignIn.this,"USER SUCC",Toast.LENGTH_SHORT).show();
+
+                            db.collection("DiaryGroupList").document(key)
+                                    .set(new DiaryGroup(tmp.email))
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void v) {
+                                            Toast.makeText(SignIn.this,"DG SUCC",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
                     }
                 });
-        db.collection("DiaryGroupList").document(tmp.name+"'s diary")
-                .set(new DiaryGroup(tmp.email))
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void v) {
-                        Toast.makeText(SignIn.this,"DG SUCC",Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void v) {
+//                        Toast.makeText(SignIn.this,"USER SUCC",Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//        db.collection("DiaryGroupList").document(tmp.name+"'s diary")
+//                .set(new DiaryGroup(tmp.email))
+//                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void v) {
+//                        Toast.makeText(SignIn.this,"DG SUCC",Toast.LENGTH_SHORT).show();
+//                    }
+//                });
     }
 }
