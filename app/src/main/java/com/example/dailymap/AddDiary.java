@@ -205,14 +205,6 @@ public class AddDiary extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),"기분이나 사진도 선택해주세요.", Toast.LENGTH_SHORT).show();
                     }
 
-                    Intent intent = new Intent(AddDiary.this, Calendar2.class);
-                    date = (TextView) findViewById(R.id.editDate);
-                    intent.putExtra("year", Integer.parseInt(String.valueOf(year)));
-                    intent.putExtra("month", Integer.parseInt(String.valueOf(month)));
-                    intent.putExtra("day", Integer.parseInt(String.valueOf(day)));
-
-                    setResult(RESULT_OK,intent);
-                    finish();
                 }
             });
         }

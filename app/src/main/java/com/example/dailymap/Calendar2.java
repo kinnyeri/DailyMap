@@ -34,6 +34,7 @@ import java.util.concurrent.Executor;
 
 public class Calendar2 extends AppCompatActivity {
     private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
+    private final AddDay addday = new AddDay();
     MaterialCalendarView materialCalendarView;
 
     //DiaryGroup 정보 유지
@@ -73,7 +74,8 @@ public class Calendar2 extends AppCompatActivity {
         materialCalendarView.addDecorators(
                 new SundayDecorator(),
                 new SaturdayDecorator(),
-                oneDayDecorator);
+                oneDayDecorator,
+                addday);
 
 
         materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
@@ -108,59 +110,26 @@ public class Calendar2 extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                //Toast.makeText(Calendar2.this,document.getData().get("date").toString(),Toast.LENGTH_LONG).show();
-                                data=document.getData().get("date").toString();
-                                TextView textViewNo = (TextView) findViewById(R.id.textViewNo);
-                                textViewNo.setText(data);
+                                Calendar calendar = Calendar.getInstance();
+                                ArrayList<CalendarDay> dates = new ArrayList<>();
+                                data = document.getData().get("date").toString();
+                                int Year= Integer.parseInt(data.substring(0,4));
+                                int Month= Integer.parseInt(data.substring(4,6));
+                                int Day= Integer.parseInt(data.substring(6));
 
+                                calendar.set(Year,Month-1,Day);
+                                CalendarDay day = CalendarDay.from(calendar);
+                                dates.add(day);
+                                materialCalendarView.addDecorator(new EventDecorator(Color.GRAY,dates,Calendar2.this));
+                                //여기 있은땐 모든 정보 받아와짐
                             }
 
+                            //여기서부터 처음것만
                         }
+
                     }
+
                 });
-
     }
 
-
-    class ApiSimulator extends AsyncTask<Void, Void, List<CalendarDay>> {
-
-
-        @Override
-        protected List<CalendarDay> doInBackground(@NonNull Void... voids) {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            Calendar calendar = Calendar.getInstance();
-            ArrayList<CalendarDay> dates = new ArrayList<>();
-            /*특정날짜 달력에 점표시해주는곳*/
-            /*월은 0이 1월 년,일은 그대로*/
-            //string 문자열인 Time_Result 을 받아와서 ,를 기준으로짜르고 string을 int 로 변환
-
-            //calendar.set(year, month - 1, dayy);
-            CalendarDay day = CalendarDay.from(calendar);
-
-            Intent intent = getIntent();
-            String date = intent.getStringExtra("date");
-            Toast.makeText(Calendar2.this,date,Toast.LENGTH_LONG).show();
-
-            // date를 받아와서 20201129이면
-            // 2020을 int year로 저장
-            // 11을 int month로 저장
-            // 29를 int dayy로 저장 시켜야함 -> 현재 date 자체가 안받아와짐
-            dates.add(day);
-            return dates;
-        }
-
-        @Override
-        protected void onPostExecute(@NonNull List<CalendarDay> calendarDays) {
-            super.onPostExecute(calendarDays);
-            if (isFinishing()) {
-                return;
-            }
-            materialCalendarView.addDecorator(new EventDecorator(Color.RED, calendarDays, Calendar2.this));
-        }
-    }
 }
