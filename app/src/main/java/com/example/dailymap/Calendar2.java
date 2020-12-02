@@ -34,7 +34,7 @@ import java.util.concurrent.Executor;
 
 public class Calendar2 extends AppCompatActivity {
     private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
-    private final AddDay addday = new AddDay();
+//    private final AddDay addday = new AddDay();
     MaterialCalendarView materialCalendarView;
 
     //DiaryGroup 정보 유지
@@ -75,7 +75,7 @@ public class Calendar2 extends AppCompatActivity {
                 new SundayDecorator(),
                 new SaturdayDecorator(),
                 oneDayDecorator,
-                addday);
+                new AddDay(curDG));
 
 
         materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
@@ -102,8 +102,7 @@ public class Calendar2 extends AppCompatActivity {
 
 
         db = FirebaseFirestore.getInstance();
-        String dgKey = FirebaseAuth.getInstance().getCurrentUser().getUid()+"000";
-        db.collection("DiaryGroupList").document(dgKey)
+        db.collection("DiaryGroupList").document(curDG)
                 .collection("diaryList").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

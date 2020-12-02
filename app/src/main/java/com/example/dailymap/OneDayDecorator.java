@@ -1,7 +1,9 @@
 package com.example.dailymap;
 
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
@@ -30,7 +32,8 @@ public class OneDayDecorator implements DayViewDecorator {
     public void decorate(DayViewFacade view) {
         view.addSpan(new StyleSpan(Typeface.BOLD));
         view.addSpan(new RelativeSizeSpan(1.4f));
-        view.addSpan(new ForegroundColorSpan(Color.GREEN));
+        view.addSpan(new ForegroundColorSpan(Color.parseColor("#345F53")));
+        //view.addSpan(new BackgroundColorSpan(Color.parseColor("#345F53")));
     }
 
     /**

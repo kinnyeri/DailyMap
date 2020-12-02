@@ -29,10 +29,9 @@ public class AddDay implements DayViewDecorator {
     static ArrayList<CalendarDay> dates;
     Calendar calendar;
 
-    public AddDay() {
+    public AddDay(String curDG) {
         db = FirebaseFirestore.getInstance();
-        String dgKey = FirebaseAuth.getInstance().getCurrentUser().getUid()+"000";
-        db.collection("DiaryGroupList").document(dgKey)
+        db.collection("DiaryGroupList").document(curDG)
                 .collection("diaryList").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -71,7 +70,7 @@ public class AddDay implements DayViewDecorator {
 
     @Override
     public void decorate(DayViewFacade view) {
-        view.addSpan(new DotSpan(8, Color.RED));
+        view.addSpan(new DotSpan(15, Color.parseColor("#345F53")));
     }
 
     /**
