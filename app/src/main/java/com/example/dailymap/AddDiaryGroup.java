@@ -117,6 +117,10 @@ public class AddDiaryGroup extends AppCompatActivity {
                     // @@사용자 공유 다이어리 목록 업데이트
                     updateDGList(user.getUid(), getName);
                     Toast.makeText(getApplicationContext(),"Submit OK", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getApplicationContext(),Main.class);
+                    intent.putExtra("curDG",getName);
+                    startActivity(intent); //추가와 동시에 메인페이지로 이동
+                    finish();
                 } else if(getName.getBytes().length<=0 &&emailList.size()>1){
                     Toast.makeText(getApplicationContext(),"다이어리 이름을 적어주세요", Toast.LENGTH_SHORT).show();
                 }
@@ -142,9 +146,7 @@ public class AddDiaryGroup extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(AddDiaryGroup.this,"DiaryGroup Add SUCC",Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getApplicationContext(),Main.class);
-                        intent.putExtra("curDG",name);
-                        startActivity(intent); //추가와 동시에 메인페이지로 이동
+
                     }
                 });
     }

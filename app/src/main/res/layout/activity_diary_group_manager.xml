@@ -2,21 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context=".DiaryGroupManager"
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/mainColor">
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:padding="10dp"
-            android:text=" 다이어리 그룹 관리"
+            android:text="다이어리 그룹 관리"
             android:textColor="@color/textColor1"
             android:textSize="30sp" />
 
@@ -27,49 +26,76 @@
             android:scaleType="centerInside"
             android:src="@drawable/ic_baseline_check_circle_24"/>
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
         <TextView
             android:id="@+id/member"
-            android:layout_width="300dp"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:text="멤버"
             android:textSize="20dp"
             android:padding="15dp"
             android:layout_gravity="center"
-            android:gravity="center_vertical"
-            android:textColor="#000000"/>
+            android:gravity="center"/>
         <ListView
             android:id="@+id/userList"
-            android:layout_width="300dp"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="#345F5360"/>
     </LinearLayout>
+
     <LinearLayout
+        android:id="@+id/linear_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:weightSum="1">
-
-        <EditText
-            android:id="@+id/edit_text"
-            android:layout_width="300dp"
-            android:layout_height="55dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_weight="0.7"
-            android:drawablePadding="16dp"
-            android:hint="추가할 이메일을 입력하세요"
-            android:padding="16dp" />
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/share_diary"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:layout_weight="0.7"
-            android:text="검색" />
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="공유 하시나요?"
+            android:textSize="20dp" />
+
+        <LinearLayout
+            android:id="@+id/add_email"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <EditText
+                android:id="@+id/get_email"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:hint="공유할 분의 이메일을 적어주세요."
+                android:inputType="text"
+                android:layout_gravity="center"
+                android:maxLines="1" />
+
+            <ImageView
+                android:id="@+id/change_email_state"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:scaleType="centerInside"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_edit_24"/>
+
+        </LinearLayout>
     </LinearLayout>
+    <Button
+        android:id="@+id/send_emailList"
+        android:layout_width="150dp"
+        android:layout_height="35dp"
+        android:background="@color/mainColor"
+        android:textColor="@color/textColor1"
+        android:text="공유 계정 추가"
+        android:textSize="20dp"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"/>
 </LinearLayout>
