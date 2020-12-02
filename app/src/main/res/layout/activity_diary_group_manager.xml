@@ -33,7 +33,7 @@
         android:orientation="vertical">
         <TextView
             android:id="@+id/member"
-            android:layout_width="300dp"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:text="멤버"
             android:textSize="20dp"
@@ -42,7 +42,7 @@
             android:gravity="center"/>
         <ListView
             android:id="@+id/userList"
-            android:layout_width="300dp"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="#345F5360"/>
@@ -63,32 +63,30 @@
             android:text="공유 하시나요?"
             android:textSize="20dp" />
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/add_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
 
             <EditText
                 android:id="@+id/get_email"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="10dp"
                 android:hint="공유할 분의 이메일을 적어주세요."
                 android:inputType="text"
+                android:layout_gravity="center"
                 android:maxLines="1" />
 
             <ImageView
                 android:id="@+id/change_email_state"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:scaleType="centerInside"
-                android:layout_toRightOf="@id/get_email"
-                android:layout_alignBottom="@id/get_email"
+                android:layout_gravity="center"
                 android:src="@drawable/ic_baseline_edit_24"/>
 
-        </RelativeLayout>
+        </LinearLayout>
     </LinearLayout>
     <Button
         android:id="@+id/send_emailList"

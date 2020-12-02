@@ -154,10 +154,10 @@ public class DiaryGroupManager extends AppCompatActivity {
                     updateDGList(user.getUid(), curDG);
                     updateDiaryGroup(user.getUid(), curDG);
                     Toast.makeText(getApplicationContext(),"Submit OK", Toast.LENGTH_SHORT).show();
-//                    Intent intent = new Intent(getApplicationContext(),Main.class);
-//                    intent.putExtra("curDG",curDG);
-//                    startActivity(intent); //추가와 동시에 메인페이지로 이동
-//                    finish();
+                    Intent intent = new Intent(getApplicationContext(),Account.class);
+                    intent.putExtra("curDG",curDG);
+                    startActivity(intent); //추가와 동시에 메인페이지로 이동
+                    finish();
                 }
                 else{
                     Toast.makeText(getApplicationContext(),"이메일을 적어주세요", Toast.LENGTH_SHORT).show();

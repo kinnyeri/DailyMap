@@ -25,7 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Account extends AppCompatActivity {
 
-    TextView name,logout,dgManager;
+    TextView name,logout,dgManager,makeDiaryGroup_btn;
     Spinner spinner;
     private FirebaseAuth mAuth;
     FirebaseFirestore db;
@@ -49,6 +49,7 @@ public class Account extends AppCompatActivity {
         dgManager=findViewById(R.id.diaryGroupManager);
         spinner=findViewById(R.id.spinner);
         listSubmit=findViewById(R.id.listSubmit);
+        makeDiaryGroup_btn=findViewById(R.id.makeDiaryGroup_btn);
 
         db = FirebaseFirestore.getInstance();
 
@@ -128,6 +129,14 @@ public class Account extends AppCompatActivity {
                 intent.putExtra("curDG",curDG);
                 startActivity(intent);
                 finish();
+            }
+        });
+        makeDiaryGroup_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Account.this,AddDiaryGroup.class);
+                intent.putExtra("curDG",curDG);
+                startActivity(intent);
             }
         });
         Toast.makeText(Account.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();

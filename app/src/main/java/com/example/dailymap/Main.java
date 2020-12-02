@@ -864,18 +864,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         });
 
         //+========================================================
-        // 공유 다이어리 추가 테스트
-        ImageButton addGroupDiary = (ImageButton) findViewById(R.id.test_group);
-        addGroupDiary.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"공유 다이어리 추가 버튼", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Main.this,AddDiaryGroup.class);
-                //다이어리 정보 유지
-                intent.putExtra("curDG",curDG);
-                startActivity(intent);
-            }
-        });
         //+=========================================================
 
     }
