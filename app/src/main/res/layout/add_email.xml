@@ -16,15 +16,12 @@
         android:inputType="text"
         android:maxLines="1" />
 
-    <!--
-    <Button
-        android:id="@+id/btn_email_add"
-        android:layout_width="60dp"
-        android:layout_height="35dp"
-        android:background="@color/mainColor"
-        android:textColor="@color/textColor1"
-        android:layout_margin="10dp"
-        android:text="추가"
-        android:textSize="20dp"/>
-        -->
+    <ImageView
+        android:id="@+id/edit_email_state_add"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:scaleType="centerInside"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/ic_baseline_edit_24" />
 </LinearLayout>

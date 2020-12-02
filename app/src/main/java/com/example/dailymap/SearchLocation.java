@@ -20,9 +20,11 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -547,54 +549,62 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
         // 검색창
         final EditText searchBox= findViewById(R.id.edit_text);
-        // 구글맵 검색하는 부분
-        searchBox.setOnKeyListener(new View.OnKeyListener() {
-
-            // 엔터키 눌렀을 경우에 검색
+        searchBox.setOnClickListener(new View.OnClickListener(){
             @Override
-            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
-                switch (keyCode){
-                    case KeyEvent.KEYCODE_ENTER:
+            public void onClick(View view){
+                searchBox.setCursorVisible(true);
+            }
+        });
 
-                        // 지오코딩 (주소,지명 -> 위도,경도)
-                        String searchAddress =searchBox.getText().toString();
-                        System.out.println(searchAddress);
+         // 구글맵 검색하는 부분
+        searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_SEARCH){
+                    // 커서 비활성화
+                    searchBox.setCursorVisible(false);
 
-                        Address addr = Geocoding(searchAddress);
+                    // 지오코딩 (주소,지명 -> 위도,경도)
+                    String searchAddress =searchBox.getText().toString();
+                    System.out.println(searchAddress);
 
-                        if(addr!=null){
-                            // 지오코딩 반환값 처리
-                            String []splitStr = addr.toString().split(",");
-                            String address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1,splitStr[0].length() - 2); // 주소
-                            System.out.println(address);
+                    Address addr = Geocoding(searchAddress);
 
-                            String latitude = splitStr[10].substring(splitStr[10].indexOf("=") + 1); // 위도
-                            String longitude = splitStr[12].substring(splitStr[12].indexOf("=") + 1); // 경도
-                            System.out.println(latitude);
-                            System.out.println(longitude);
+                    if(addr!=null){
+                        // 지오코딩 반환값 처리
+                        String []splitStr = addr.toString().split(",");
+                        String address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1,splitStr[0].length() - 2); // 주소
+                        System.out.println(address);
 
-                            String locationName = addr.getFeatureName(); // 주소 이름
-                            System.out.println(locationName);
+                        String latitude = splitStr[10].substring(splitStr[10].indexOf("=") + 1); // 위도
+                        String longitude = splitStr[12].substring(splitStr[12].indexOf("=") + 1); // 경도
+                        System.out.println(latitude);
+                        System.out.println(longitude);
 
-                            LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)); // 좌표(위도, 경도) 생성
+                        String locationName = addr.getFeatureName(); // 주소 이름
+                        System.out.println(locationName);
 
-                            // 마커 생성
-                            AddMarker(locationName,address,point);
+                        LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)); // 좌표(위도, 경도) 생성
 
-                            // 해당 좌표로 화면 줌
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point,15));
-                        }
+                        // 마커 생성
+                        AddMarker(locationName,address,point);
 
-                        // 토스트 메시지 띄우기 (검색창 텍스트 내용)
-                        Toast.makeText(getApplicationContext(),searchBox.getText()+"구글맵 검색!!", Toast.LENGTH_LONG).show();
+                        // 해당 좌표로 화면 줌
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point,15));
+                    }
 
-                        // 검색창 내용 초기화
-                        searchBox.getText().clear();
+                    // 토스트 메시지 띄우기 (검색창 텍스트 내용)
+                    Toast.makeText(getApplicationContext(),searchBox.getText()+"구글맵 검색!!", Toast.LENGTH_LONG).show();
 
-                        // 가상 키보드 숨기기
-                        HideKeyboard(searchBox);
+                    // 검색창 내용 초기화
+                    //searchBox.getText().clear();
+
+                    // 가상 키보드 숨기기
+                    HideKeyboard(searchBox);
+
+                    return true;
                 }
-                return true;
+                return false;
             }
         });
     }

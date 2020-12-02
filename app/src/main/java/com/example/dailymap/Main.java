@@ -21,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -47,13 +48,20 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class Main extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -91,6 +99,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
     //DiaryGroup 정보 유지
     String curDG;
     FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
+    private FirebaseFirestore db;
 
     @Override //Auth 확인
     protected void onStart() {
@@ -123,6 +132,27 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         Toast.makeText(Main.this,"1현재 : "+curDG,Toast.LENGTH_LONG).show();
         if(curDG==null) curDG = user.getDisplayName()+"'s diary";
         Toast.makeText(Main.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
+
+        // DB에서 현재 DiaryGroup의 diaryList 정보 가져오기
+        db.collection("DiaryGroupList").document(curDG)
+                .collection("diaryList")
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            ArrayList<Map<String,Object>> dataList = new ArrayList<Map<String, Object>>();
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        dataList.add(document.getData());
+                        System.out.println(curDG+ "dataList!!!!!: "+dataList);
+                        System.out.println(curDG+ "- 위도: "+dataList.get(dataList.size()-1).get("locationX"));
+                        System.out.println(curDG+ "- 경도: "+dataList.get(dataList.size()-1).get("locationY"));
+                    }
+                    addMarkerFromDB(dataList);
+                } else {
+                    Toast.makeText(Main.this,"Failed to get img",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
@@ -130,7 +160,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // ++ ============================
+        db = FirebaseFirestore.getInstance();
+
         mLayout = findViewById(R.id.layout_main);
         locationRequest = new LocationRequest()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -231,8 +262,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
 
 
         LatLng SEOUL = new LatLng(37.57, 126.97);
-        // 마커 추가
-        AddMarker("경복궁","투어&박물관이 있는 역사적인 궁전",SEOUL);
+        // 마커 추가 ( DB에서 가져오기 전 테스트 용이었음 )
+        //AddMarker("경복궁","투어&박물관이 있는 역사적인 궁전",SEOUL);
         // SEOUL로 카메라 시점 이동
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SEOUL, 10));
 
@@ -258,7 +289,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 if(slidePage.getVisibility()==View.GONE){
                     ShowLayout(slidePage, slideButtons);
                 }
-
                 return true;
             }
         });
@@ -271,6 +301,11 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 // 가상키보드 숨기기
                 final EditText searchBox= findViewById(R.id.edit_text);
                 HideKeyboard(searchBox);
+
+                // 검색창 커서 활성화 되어있는 경우 비활성화 시키기
+                if(searchBox.isCursorVisible()){
+                    searchBox.setCursorVisible(false);
+                }
 
                 // 슬라이딩 화면(마커 클릭 시 나온 화면) 보이는 경우 다시 내려가게 하기
                 if(slidePage.getVisibility()==View.VISIBLE){
@@ -296,6 +331,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                                 phone=null,url=null,
                                 extras=null]
                          */
+                        /*
                     Address addr= ReverseGeocoding(point);
 
                     if(addr!=null){
@@ -305,6 +341,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                         // 지도에서 클릭한 위치에 마커 추가
                         AddMarker(locationName,address,point);
                     }
+                         */
                 }
             }
         });
@@ -353,6 +390,27 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
     }
 
     // ++ ===================================================
+
+    public void addMarkerFromDB(ArrayList<Map<String,Object>> data){
+        for(int i=0; i<data.size(); i++){
+            double latitude; // 위도
+            double longitude; // 경도
+            latitude= (double) data.get(i).get("locationX");
+            longitude = (double) data.get(i).get("locationY");
+
+            LatLng latLng = new LatLng(latitude, longitude);
+            System.out.println(latitude+", " +longitude);
+            Address addr= ReverseGeocoding(latLng);
+
+            if(addr!=null){
+                String locationName = addr.getFeatureName(); // 주소이름,
+                String address = addr.getAddressLine(0); // 주소
+
+                // DB에서 가져온 기록장 정보 위치에 마커 추가
+                AddMarker(locationName,address,latLng);
+            }
+        }
+    }
 
     // 지도에서 초기 위치 설정
     public void setDefaultLocation() {
@@ -703,56 +761,66 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
 
         // 검색창
         final EditText searchBox= findViewById(R.id.edit_text);
-        // 구글맵 검색하는 부분
-        searchBox.setOnKeyListener(new View.OnKeyListener() {
 
-            // 엔터키 눌렀을 경우에 검색
+        searchBox.setOnClickListener(new View.OnClickListener(){
             @Override
-            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
-                switch (keyCode){
-                    case KeyEvent.KEYCODE_ENTER:
-                        // 슬라이드 패널 가리기
-                        HideLayout(slidePage,slideButtons);
+            public void onClick(View view){
+                searchBox.setCursorVisible(true);
+            }
+        });
 
-                        // 지오코딩 (주소,지명 -> 위도,경도)
-                        String searchAddress =searchBox.getText().toString();
-                        System.out.println(searchAddress);
+        // 구글맵 검색하는 부분
+        searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_SEARCH){
+                    // 커서 비활성화
+                    searchBox.setCursorVisible(false);
 
-                        Address addr = Geocoding(searchAddress);
+                    // 슬라이드 패널 가리기
+                    HideLayout(slidePage,slideButtons);
 
-                        if(addr!=null){
-                            // 지오코딩 반환값 처리
-                            String []splitStr = addr.toString().split(",");
-                            String address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1,splitStr[0].length() - 2); // 주소
-                            System.out.println(address);
+                    // 지오코딩 (주소,지명 -> 위도,경도)
+                    String searchAddress =searchBox.getText().toString();
+                    System.out.println(searchAddress);
 
-                            String latitude = splitStr[10].substring(splitStr[10].indexOf("=") + 1); // 위도
-                            String longitude = splitStr[12].substring(splitStr[12].indexOf("=") + 1); // 경도
-                            System.out.println(latitude);
-                            System.out.println(longitude);
+                    Address addr = Geocoding(searchAddress);
 
-                            String locationName = addr.getFeatureName(); // 주소 이름
-                            System.out.println(locationName);
+                    if(addr!=null){
+                        // 지오코딩 반환값 처리
+                        String []splitStr = addr.toString().split(",");
+                        String address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1,splitStr[0].length() - 2); // 주소
+                        System.out.println(address);
 
-                            LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)); // 좌표(위도, 경도) 생성
+                        String latitude = splitStr[10].substring(splitStr[10].indexOf("=") + 1); // 위도
+                        String longitude = splitStr[12].substring(splitStr[12].indexOf("=") + 1); // 경도
+                        System.out.println(latitude);
+                        System.out.println(longitude);
 
-                            // 마커 생성
-                            AddMarker(locationName,address,point);
+                        String locationName = addr.getFeatureName(); // 주소 이름
+                        System.out.println(locationName);
 
-                            // 해당 좌표로 화면 줌
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point,15));
-                        }
+                        LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)); // 좌표(위도, 경도) 생성
 
-                        // 토스트 메시지 띄우기 (검색창 텍스트 내용)
-                        Toast.makeText(getApplicationContext(),searchBox.getText()+"구글맵 검색!!", Toast.LENGTH_LONG).show();
+                        // 마커 생성
+                        AddMarker(locationName,address,point);
 
-                        // 검색창 내용 초기화
-                        searchBox.getText().clear();
+                        // 해당 좌표로 화면 줌
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point,15));
+                    }
 
-                        // 가상 키보드 숨기기
-                        HideKeyboard(searchBox);
+                    // 토스트 메시지 띄우기 (검색창 텍스트 내용)
+                    Toast.makeText(getApplicationContext(),searchBox.getText()+"구글맵 검색!!", Toast.LENGTH_LONG).show();
+
+                    // 검색창 내용 초기화
+                    //searchBox.getText().clear();
+
+                    // 가상 키보드 숨기기
+                    HideKeyboard(searchBox);
+
+                    return true;
                 }
-                return true;
+                return false;
             }
         });
     }

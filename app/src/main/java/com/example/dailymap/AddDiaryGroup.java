@@ -36,15 +36,13 @@ public class AddDiaryGroup extends AppCompatActivity {
 
     EditText diaryName;
     EditText email;
+    ImageView emailIV; // 이메일 EditText 상태 표시
+    Button addEmailBtn; // 이메일 추가버튼
+    ImageView submit; // 완료 버튼
 
-    // 이메일 추가버튼
-    Button addEmailBtn;
-
-    // 완료 버튼
-    ImageView submit;
-
-    // 공유하는 계정 수 (디폴트 :1 자기 계정)
-    int numEmail=1;
+    // 공유하는 계정 수 (디폴트 :0 자기 계정 + 공유 계정 한개)
+    //                  공유 계정 추가 시 +1
+    int numAddEmail=0;
     Vector<String> emailList = new Vector<String>(); // 이메일 리스트 저장
 
     private FirebaseFirestore db;
@@ -70,11 +68,15 @@ public class AddDiaryGroup extends AppCompatActivity {
         diaryName= (EditText)findViewById(R.id.edit_diary_name); // 다이어리 이름 입력창
         email=(EditText)findViewById(R.id.edit_email);
         addEmailBtn = findViewById(R.id.btn_add_email);
+        emailIV = findViewById(R.id.edit_email_state); // 이메일 입력창 우측 아이콘
 
         addEmailBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 HideKeyboard(email);
+                email.setFocusable(false);  // 입력 완료한 EditText 비활성화
+                email.setClickable(false);
+                emailIV.setImageResource(R.drawable.ic_baseline_done_24); // 우측 아이콘 done 으로 변경
 
                 String getEdit = email.getText().toString();
 
@@ -86,22 +88,18 @@ public class AddDiaryGroup extends AppCompatActivity {
                 if(getEdit.getBytes().length>0){
                     emailList.add(email.getText().toString()); // 추가 버튼 누른 경우 입력한 이메일 emailList에 추가
 
-                    numEmail++; // 공유하는 계정 수 +1
+                    numAddEmail++; // 공유하는 계정 수 +1
 
-                    // emailList의 인덱스는 0부터 numEmail-1
-                    Toast.makeText(getApplicationContext(), emailList.size()+", "+ emailList.get(numEmail-1), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), emailList.size()+", "+ emailList.get(numAddEmail), Toast.LENGTH_SHORT).show();
 
                     LayoutInflater mInflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
                     LinearLayout mRootLinear =(LinearLayout)findViewById(R.id.linear_root);
 
                     mInflater.inflate(R.layout.add_email, mRootLinear,true);
                     email = (EditText)findViewById(R.id.edit_email_add);
-                    email.setId(numEmail);
-
-                    //addEmailBtn = (Button)findViewById(R.id.btn_email_add);
-                    //Button add_email = (Button)addLayout.findViewById(R.id.btn_add_email);
-                    //mRootLinear.addView(addLayout);
-                    //Toast.makeText(getApplicationContext(),"이메일 추가 버튼"+add_email.getId(), Toast.LENGTH_SHORT).show();
+                    email.setId(numAddEmail);
+                    emailIV= findViewById(R.id.edit_email_state_add);
+                    emailIV.setId(-numAddEmail);
                 }
             }
         });
@@ -111,27 +109,26 @@ public class AddDiaryGroup extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String getName = diaryName.getText().toString();
-                Toast.makeText(getApplicationContext(),getName, Toast.LENGTH_SHORT).show();
-                //Toast.makeText(getApplicationContext(), "SUBMIT"+emailList.size()+", "+ emailList.get(numEmail), Toast.LENGTH_SHORT).show();
-                System.out.println("NAME: "+getName);
-                System.out.println("SUBMIT: "+emailList.size()+", "+ emailList.get(numEmail-1)); // 인덱스는 0부터 시작하므로 접근할 때는 numEmail-1
 
                 // 디비에 내용 저장
-                if(getName.getBytes().length>0 &&emailList.size()>0){
-
+                if(getName.getBytes().length>0 &&emailList.size()>1){
                     // @@@@@@@@ 내용 저장 @@@@@@@@@
                     addNewDiaryGroup(user.getUid(), getName);
                     // @@사용자 공유 다이어리 목록 업데이트
                     updateDGList(user.getUid(), getName);
                     Toast.makeText(getApplicationContext(),"Submit OK", Toast.LENGTH_SHORT).show();
-                } else{
+                } else if(getName.getBytes().length<=0 &&emailList.size()>1){
+                    Toast.makeText(getApplicationContext(),"다이어리 이름을 적어주세요", Toast.LENGTH_SHORT).show();
+                }
+                else if(getName.getBytes().length>0 &&emailList.size()<=1){
                     Toast.makeText(getApplicationContext(),"이메일을 적어주세요", Toast.LENGTH_SHORT).show();
                 }
-
+                else{
+                    Toast.makeText(getApplicationContext(),"다이어리 이름, 이메일을 적어주세요", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         Toast.makeText(AddDiaryGroup.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
-
     }
 
 
