@@ -149,9 +149,10 @@ public class DiaryGroupManager extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 디비에 내용 저장
-                if(emailList.size()>1){
+                if(emailList.size()>0){
                     // @@사용자 공유 다이어리 목록 업데이트
                     updateDGList(user.getUid(), curDG);
+                    updateDiaryGroup(user.getUid(), curDG);
                     Toast.makeText(getApplicationContext(),"Submit OK", Toast.LENGTH_SHORT).show();
 //                    Intent intent = new Intent(getApplicationContext(),Main.class);
 //                    intent.putExtra("curDG",curDG);
@@ -167,8 +168,10 @@ public class DiaryGroupManager extends AppCompatActivity {
             }
         });
     }
+
     private void updateDGList(String uid,final String name) {
         for (int i = 0; i < emailList.size(); i++) {
+            System.out.println("emailList!!!!"+emailList.get(i));
             db.collection("UserList").whereEqualTo("email", emailList.get(i))
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -176,16 +179,25 @@ public class DiaryGroupManager extends AppCompatActivity {
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                             if (task.isSuccessful()) {
                                 for (QueryDocumentSnapshot document : task.getResult()) {
+                                    db.collection("UserList").whereEqualTo("update DGLIST!!!!!",document.getData().get("email").toString() );
                                     document.getReference().update("diaryGroupList", FieldValue.arrayUnion(name));
                                     System.out.println("++++"+document.getData().get("email").toString());
                                 }
                             }
                         }
                     });
-            db.collection("DiaryGroupList").document(curDG)
+
+        }
+    }
+
+    private void updateDiaryGroup(String uid, String name){
+        for(int i=0; i<emailList.size();i++){
+            System.out.println("update diary group!!!!"+emailList.get(i));
+            db.collection("DiaryGroupList").document(name)
                     .update("userList",FieldValue.arrayUnion(emailList.get(i)));
         }
     }
+
     public class ListAdapter extends BaseAdapter {
         private Context context;
         private String[] list;
