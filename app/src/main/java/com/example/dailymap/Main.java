@@ -289,7 +289,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 if(slidePage.getVisibility()==View.GONE){
                     ShowLayout(slidePage, slideButtons);
                 }
-                
                 return true;
             }
         });
@@ -302,6 +301,11 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 // 가상키보드 숨기기
                 final EditText searchBox= findViewById(R.id.edit_text);
                 HideKeyboard(searchBox);
+
+                // 검색창 커서 활성화 되어있는 경우 비활성화 시키기
+                if(searchBox.isCursorVisible()){
+                    searchBox.setCursorVisible(false);
+                }
 
                 // 슬라이딩 화면(마커 클릭 시 나온 화면) 보이는 경우 다시 내려가게 하기
                 if(slidePage.getVisibility()==View.VISIBLE){
@@ -327,6 +331,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                                 phone=null,url=null,
                                 extras=null]
                          */
+                        /*
                     Address addr= ReverseGeocoding(point);
 
                     if(addr!=null){
@@ -336,6 +341,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                         // 지도에서 클릭한 위치에 마커 추가
                         AddMarker(locationName,address,point);
                     }
+                         */
                 }
             }
         });
