@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -19,6 +20,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -71,6 +73,8 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
     Location mCurrentLocation;
     LatLng currentPosition;
+
+    private Marker searchMarker= null; // 검색한 위치 표시 마커
 
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest locationRequest;
@@ -175,7 +179,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
         LatLng SEOUL = new LatLng(37.57, 126.97);
         // 마커 추가
-        AddMarker("경복궁","투어&박물관이 있는 역사적인 궁전",SEOUL);
+        //AddMarker("경복궁","투어&박물관이 있는 역사적인 궁전",SEOUL);
         // SEOUL로 카메라 시점 이동
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SEOUL, 10));
 
@@ -235,6 +239,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                                 phone=null,url=null,
                                 extras=null]
                          */
+                        /*
                 Address addr= ReverseGeocoding(point);
 
                 if(addr!=null){
@@ -244,6 +249,8 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                     // 지도에서 클릭한 위치에 마커 추가
                     AddMarker(locationName,address,point);
                 }
+
+                         */
             }
         });
     }
@@ -545,6 +552,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
 
     // 검색 핸들러
+    @SuppressLint("ClickableViewAccessibility")
     public void SearchHandler(){
 
         // 검색창
@@ -587,6 +595,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                         LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)); // 좌표(위도, 경도) 생성
 
                         // 마커 생성
+                        if (searchMarker != null) searchMarker.remove();
                         AddMarker(locationName,address,point);
 
                         // 해당 좌표로 화면 줌
@@ -603,6 +612,26 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                     HideKeyboard(searchBox);
 
                     return true;
+                }
+                return false;
+            }
+        });
+
+        // 검색창 x 버튼 기능
+        searchBox.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int DRAWABLE_LEFT = 0;
+                final int DRAWABLE_TOP = 1;
+                final int DRAWABLE_RIGHT = 2;
+                final int DRAWABLE_BOTTOM = 3;
+
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (searchBox.getRight() - searchBox.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        // 검색창 내용 초기화
+                        searchBox.getText().clear();
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -678,9 +707,9 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
         mOptions.snippet(snippet);
         mOptions.position(point);
         // 마커 아이콘 변경 (비트맵 이미지만 가능)
-        mOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_leaf_32));
+        mOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_leaf2_32));
         // 마커 추가
-        Marker marker =mMap.addMarker(mOptions);
+        searchMarker =mMap.addMarker(mOptions);
 
         // 추가한 마커 정보 표시
         // marker.showInfoWindow();

@@ -30,6 +30,7 @@
             android:padding="16dp"
             android:background="@drawable/bg_editbox"
             android:drawableLeft="@drawable/ic_baseline_search_24"
+            android:drawableRight="@drawable/ic_baseline_clear_24"
             android:drawablePadding="16dp"
             android:hint="장소 검색"
             android:maxLines="1"
@@ -102,6 +103,7 @@
             android:weightSum="1">
 
             <ImageView
+                android:id="@+id/diary_image_1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.7"
@@ -109,6 +111,7 @@
                 android:scaleType="centerCrop"/>
 
             <ImageView
+                android:id="@+id/diary_image_2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.3"
@@ -131,7 +134,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="0.4"
                 android:text="경복궁"
-                android:textSize="30dp"
+                android:textSize="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"/>

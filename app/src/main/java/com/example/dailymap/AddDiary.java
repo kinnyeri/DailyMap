@@ -128,6 +128,7 @@ public class AddDiary extends AppCompatActivity {
         feels[1]= (ImageView)findViewById(R.id.mid);
         feels[2]= (ImageView)findViewById(R.id.bad);
         content =(EditText)findViewById(R.id.editContent);
+        place = findViewById(R.id.editPlace);
 
         if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.M){
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},0);
@@ -146,17 +147,20 @@ public class AddDiary extends AppCompatActivity {
             }
         });
 
-        // place 지정
-        place = findViewById(R.id.editPlace);
+        // place 지정, main에서 받아온 장소 정보 사용
+        location = getIntent().getStringExtra("mLocation");
+        latitude = getIntent().getDoubleExtra("mLatitude", 0);
+        longitude = getIntent().getDoubleExtra("mLongitude", 0);
+        if(location!= null){ // 받아온 값이 있는 경우 해당 정보로 디폴트 값 설정
+            LatLng latLng = new LatLng(latitude,longitude);
+            place.setText(location);
+            newD.setLocation(latitude,longitude);
+            System.out.println(latLng);
+        }
         place.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 Toast.makeText(getApplicationContext(),"장소 추가!!", Toast.LENGTH_SHORT).show();
-                /*
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                startActivityForResult(intent, 101);
-                */
                 Intent intent = new Intent(AddDiary.this, SearchLocation.class);
                 startActivityForResult(intent,REQ_ADD_CONTACT);
             }
@@ -266,8 +270,7 @@ public class AddDiary extends AppCompatActivity {
                 latitude = intent.getDoubleExtra("latitude", 0);
                 longitude = intent.getDoubleExtra("longitude", 0);
                 LatLng latLng = new LatLng(latitude,longitude);
-                
-                place = findViewById(R.id.editPlace);
+
                 place.setText(location);
                 newD.setLocation(latitude,longitude);
                 System.out.println(latLng);
