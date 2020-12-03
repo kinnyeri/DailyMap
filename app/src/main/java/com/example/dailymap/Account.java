@@ -32,11 +32,18 @@ public class Account extends AppCompatActivity {
     //DiaryGroup 정보 유지
     String curDG;
     ImageView listSubmit;
-    boolean changed = false;
+
     @Override
     protected void onStart() {
         super.onStart();
         //DiaryGroup 정보 유지
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        curDG= getIntent().getStringExtra("curDG");
+        Toast.makeText(getApplicationContext(),"on NEW INTENT",Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -86,6 +93,7 @@ public class Account extends AppCompatActivity {
                 ArrayAdapter spinAdapter = new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_spinner_dropdown_item,list);
                 spinner.setAdapter(spinAdapter);
                 int pos = spinAdapter.getPosition(curDG);
+                Toast.makeText(getApplicationContext(),"현재 : "+pos,Toast.LENGTH_SHORT).show();
                 spinner.setSelection(pos);
             }
         });
@@ -94,8 +102,6 @@ public class Account extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 String selected = adapterView.getItemAtPosition(i).toString();
                 curDG = selected;
-                //curDG= curDG.replaceFirst(" ","");
-                //startActivity(intent);
             }
 
             @Override

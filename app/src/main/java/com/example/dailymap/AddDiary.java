@@ -81,8 +81,7 @@ public class AddDiary extends AppCompatActivity {
         db = FirebaseFirestore.getInstance(); //Init Firestore
         user = FirebaseAuth.getInstance().getCurrentUser();
         newD = new DiaryDS(user.getEmail());
-        //newD.setLocation(37.26,125.27);
-        //newD.setImg("no idea");
+
         //Storage
         storage=FirebaseStorage.getInstance("gs://daily-map-d47b1.appspot.com");
         storageRef = storage.getReference();
@@ -98,7 +97,6 @@ public class AddDiary extends AppCompatActivity {
             date.setText(year+"/"+month+"/"+day);
         }
 
-
         callbackMethod = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int tyear, int tmonth, int tday) {
@@ -106,7 +104,6 @@ public class AddDiary extends AppCompatActivity {
                 date.setText(year+"/"+month+"/"+day);
             }
         };
-
 
         date.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,12 +113,8 @@ public class AddDiary extends AppCompatActivity {
                 dialog.getDatePicker().setCalendarViewShown(false);
                 dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                 dialog.show();
-
-
             }
         });
-
-
 
         //View 할당
         imgContent = (ImageView)findViewById(R.id.editImg);
@@ -139,10 +132,6 @@ public class AddDiary extends AppCompatActivity {
         imgContent.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(Intent.ACTION_PICK);
-//                intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-//                startActivityForResult(intent, 101);
-
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
                 startActivityForResult(intent,IMG_GETIN);
@@ -204,14 +193,12 @@ public class AddDiary extends AppCompatActivity {
                     } else{
                         Toast.makeText(getApplicationContext(),"기분이나 사진도 선택해주세요.", Toast.LENGTH_SHORT).show();
                     }
-
                 }
             });
         }
         Toast.makeText(AddDiary.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
     }
     private void addNewContent(){
-        //newD.display(AddDiary.this);
         db.collection("DiaryGroupList").document(curDG)
                 .collection("diaryList")
                 .add(newD)
@@ -230,7 +217,6 @@ public class AddDiary extends AppCompatActivity {
         Toast.makeText(AddDiary.this,getPath(tmpUri),Toast.LENGTH_SHORT).show();
         //이미지 경로 : curDG
         StorageReference ref = storageRef.child(curDG).child(imgName);
-
         Toast.makeText(AddDiary.this,file.getLastPathSegment(),Toast.LENGTH_SHORT).show();
 
         // Register observers to listen for when the download is done or if it fails

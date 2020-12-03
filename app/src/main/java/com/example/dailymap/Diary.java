@@ -67,6 +67,7 @@ public class Diary extends AppCompatActivity {
         String locX = intent.getExtras().getString("locationX");
         String locY = intent.getExtras().getString("locationY");
         String feels = intent.getExtras().getString("feel");
+        //String location = intent.getStringExtra("mLocation");
         loc.setText(locX+", "+locY);
         switch (feels){
             case "0":
@@ -77,6 +78,7 @@ public class Diary extends AppCompatActivity {
                 feel.setImageResource(feelThumbs[2]); break;
         }
         String tmpDate =intent.getExtras().getString("date"); //date 나중에
+        date.setText(tmpDate.substring(0,4)+"/"+tmpDate.substring(4,6)+"/"+tmpDate.substring(6,8));
         content.setText(intent.getExtras().getString("content"));
 
         db = FirebaseFirestore.getInstance(); //Init Firestore

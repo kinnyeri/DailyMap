@@ -66,7 +66,6 @@
                 android:id="@+id/spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:entries="@array/diary_group_list"
                 android:layout_gravity="center"
                 android:layout_weight="1">
             </Spinner>

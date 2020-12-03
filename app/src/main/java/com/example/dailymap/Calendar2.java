@@ -43,7 +43,7 @@ public class Calendar2 extends AppCompatActivity {
     static final int REQ_ADD_CONTACT=1;
     String data;
     private FirebaseFirestore db;
-
+    private static final int CALENDAR_DIARY_LIST = 526;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +53,12 @@ public class Calendar2 extends AppCompatActivity {
 
         materialCalendarView = (MaterialCalendarView) findViewById(R.id.calendarView);
         ImageButton add_btn = (ImageButton) findViewById(R.id.add_btn);
-
-
         add_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getApplicationContext(), "기록장 추가 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Calendar2.this, AddDiary.class);
+                intent.putExtra("curDG",curDG);
                 startActivityForResult(intent,REQ_ADD_CONTACT);
             }
         });
@@ -93,8 +92,14 @@ public class Calendar2 extends AppCompatActivity {
 
                 Log.i("shot_Day test", shot_Day + "");
                 materialCalendarView.clearSelection();
-
-                Toast.makeText(getApplicationContext(), shot_Day, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "click "+shot_Day, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Calendar2.this, DiaryList.class);
+                intent.putExtra("curDG",curDG);
+                intent.putExtra("code",CALENDAR_DIARY_LIST);
+                intent.putExtra("year",Year);
+                intent.putExtra("month",Month);
+                intent.putExtra("day",Day);
+                startActivity(intent);
             }
         });
 

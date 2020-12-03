@@ -115,6 +115,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
     //DiaryGroup 정보 유지
     String curDG;
     FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
+    private static final int MAP_DIARY_LIST = 403;
+
     private FirebaseFirestore db;
     private FirebaseStorage storage;
     private StorageReference storageRef;
@@ -132,7 +134,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             Intent intent = new Intent(getApplicationContext(),SignIn.class);
             startActivity(intent);
         }
-
         // ++ ===============================================
         if (checkPermission()) {
 
@@ -826,7 +827,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 Intent intent = new Intent(Main.this,AddDiary.class);
                 //다이어리 정보 유지
                 intent.putExtra("curDG",curDG);
-
                 // 마커 위치 정보 디폴트로 넘겨줌
                 mLocation = clickLocation;
                 mLatitude = clickLatitude;
@@ -858,7 +858,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 intent.putExtra("mLocation", mLocation);
                 intent.putExtra("mLatitude", mLatitude);
                 intent.putExtra("mLongitude", mLongitude);
-
+                intent.putExtra("code",MAP_DIARY_LIST);
                 startActivity(intent);
             }
         });

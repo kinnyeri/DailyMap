@@ -5,8 +5,7 @@
     android:id="@+id/ScrollView1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Diary"
-    android:background="@color/mainColor">
+    tools:context=".Diary">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,7 +35,7 @@
                     android:text="제주 곽지해수욕장"
                     android:textSize="20dp"
                     android:padding="30px"
-                    android:textColor="#ECE6CC"
+                    android:textColor="@color/mainColor"
                     />
                 <ImageView
                     android:id="@+id/diaryFeel"
@@ -55,7 +54,7 @@
                 android:text="2020/11/1"
                 android:textSize="20dp"
                 android:padding="30px"
-                android:textColor="#ECE6CC"/>
+                android:textColor="@color/mainColor"/>
             <TextView
                 android:id="@+id/diaryContent"
                 android:layout_width="wrap_content"
@@ -64,7 +63,7 @@
                 android:text="너무 추웠지만 해는 밝고 바다는 투명하여 아름다웠다.이곳의 색들의 진함을 좋아한다. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
                 android:textSize="20dp"
                 android:inputType="textMultiLine"
-                android:textColor="#ECE6CC"
+                android:textColor="@color/mainColor"
                 />
         </LinearLayout>
     </LinearLayout>

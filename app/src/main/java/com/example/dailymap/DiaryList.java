@@ -54,27 +54,37 @@ public class DiaryList extends AppCompatActivity {
     private StorageReference storageRef;
     //DiaryGroup 정보 유지
     String curDG;
+    private static final int MAP_DIARY_LIST = 403;
+    private static final int CALENDAR_DIARY_LIST = 526;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary_list);
         //DiaryGroup 정보 유지
-        curDG = getIntent().getStringExtra("curDG");
+        Intent getIntent = getIntent();
+        curDG = getIntent.getStringExtra("curDG");
 
-        System.out.println("onCreate--------------------------------------");
         strImg = new Vector<Map<String,Object>>();
-
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         db = FirebaseFirestore.getInstance(); //Init Firestore
         Toast.makeText(DiaryList.this,strImg.size()+" ?",Toast.LENGTH_SHORT).show();
 
         gv = (GridView) findViewById(R.id.gridList);
-        db.collection("DiaryGroupList").document(curDG)
-                .collection("diaryList")
-                .whereEqualTo("feel",1)
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+        switch (getIntent.getIntExtra("code",0)){
+            case 0:
+                Toast.makeText(getApplicationContext(),"다이어리 정보가 없습니다.",Toast.LENGTH_LONG).show();
+                break;
+            case MAP_DIARY_LIST:
+                Double lat = getIntent.getDoubleExtra("mLatitude",0.1);
+                Double lon = getIntent.getDoubleExtra("mLongitude",0.1);
+                Toast.makeText(getApplicationContext(),lat+" , "+lon,Toast.LENGTH_LONG).show();
+                db.collection("DiaryGroupList").document(curDG)
+                        .collection("diaryList")
+                        .whereEqualTo("locationX",lat).whereEqualTo("locationY",lon)
+                        .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     ArrayList<Map<String,Object>> imgLists = new ArrayList<Map<String, Object>>();
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -83,13 +93,41 @@ public class DiaryList extends AppCompatActivity {
                                 imgLists.add(document.getData());
                                 Toast.makeText(DiaryList.this,"Succ",Toast.LENGTH_SHORT).show();
                             }
-
                             gv.setAdapter(new ImgAdapter(DiaryList.this,imgLists));
                         } else {
                             Toast.makeText(DiaryList.this,"Failed to get img",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+                break;
+            case CALENDAR_DIARY_LIST:
+                String y = getIntent.getIntExtra("year",0)+"";
+                int tmp = getIntent.getIntExtra("month",0);
+                String m = tmp<10 ? "0"+tmp : tmp+"";
+                tmp = getIntent.getIntExtra("day",0);
+                String d = tmp<10 ? "0"+tmp : tmp+"";
+
+                db.collection("DiaryGroupList").document(curDG)
+                        .collection("diaryList")
+                        .whereEqualTo("date",y+m+d)
+                        .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    ArrayList<Map<String,Object>> imgLists = new ArrayList<Map<String, Object>>();
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                imgLists.add(document.getData());
+                                Toast.makeText(DiaryList.this,"Succ",Toast.LENGTH_SHORT).show();
+                            }
+                            gv.setAdapter(new ImgAdapter(DiaryList.this,imgLists));
+                        } else {
+                            Toast.makeText(DiaryList.this,"Failed to get img",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                break;
+        }
+
 
         iv=(ImageView)findViewById(R.id.temp);
 
@@ -165,6 +203,7 @@ public class DiaryList extends AppCompatActivity {
                     intent.putExtra("date",tmpList.get("date").toString());
                     intent.putExtra("content",tmpList.get("content").toString());
                     intent.putExtra("curDG",curDG);
+                    intent.putExtra("mLocation",getIntent().getStringExtra("mLocation"));
                     startActivity(intent);
                 }
             });
