@@ -98,7 +98,7 @@
                 android:id="@+id/diary_image_1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.7"
+                android:layout_weight="0.6"
                 android:src="@drawable/sample1"
                 android:scaleType="centerCrop"/>
 
@@ -106,7 +106,7 @@
                 android:id="@+id/diary_image_2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.3"
+                android:layout_weight="0.4"
                 android:src="@drawable/sample2"
                 android:scaleType="centerCrop"/>
 

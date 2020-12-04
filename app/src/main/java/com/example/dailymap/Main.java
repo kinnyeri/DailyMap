@@ -325,27 +325,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                                 placeText.setText(marker.getSnippet());
                                 diaryNum.setText("기록 +" + diaryLists.size());
 
-                                //Storage
-                                storage= FirebaseStorage.getInstance("gs://daily-map-d47b1.appspot.com");
-                                storageRef = storage.getReference();
-
-                                storageRef.child(curDG+"/"+diaryLists.get(diaryLists.size()-1).get("img").toString())
-                                        .getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    ImageView tmpIV=findViewById(R.id.diary_image_1);
-                                    @Override
-                                    public void onSuccess(Uri uri) {
-                                        Glide.with(Main.this)
-                                                .load(uri)
-                                                .into(tmpIV);
-                                        Toast.makeText(Main.this,"이미지 불러오기 성공",Toast.LENGTH_LONG).show();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        System.out.println(e);
-                                        Toast.makeText(Main.this,"이미지 불러오기 실패",Toast.LENGTH_LONG).show();
-                                    }
-                                });
                             }
 
                             // 해당 마커 위치에 기록장 정보가 없는 경우
@@ -355,6 +334,55 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                             }
                             // 해당 마커 위치에 기록장 정보가 있는 경우
                             else{
+                                // 사진 불러오기
+                                //Storage
+                                storage= FirebaseStorage.getInstance("gs://daily-map-d47b1.appspot.com");
+                                storageRef = storage.getReference();
+
+                                final ImageView tmp1=findViewById(R.id.diary_image_1);
+                                final ImageView tmp2=findViewById(R.id.diary_image_2);
+                                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) tmp1.getLayoutParams();
+
+                                params.weight = 1.0f;
+                                tmp1.setLayoutParams(params);
+                                storageRef.child(curDG+"/"+diaryLists.get(0).get("img").toString())
+                                        .getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        Glide.with(Main.this)
+                                                .load(uri)
+                                                .into(tmp1);
+                                        Toast.makeText(Main.this,"이미지 불러오기 성공",Toast.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        System.out.println(e);
+                                        Toast.makeText(Main.this,"이미지 불러오기 실패",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                                if(diaryLists.size()>1) {
+                                    params.weight = 0.6f;
+                                    tmp1.setLayoutParams(params);
+                                    storageRef.child(curDG+"/"+diaryLists.get(1).get("img").toString())
+                                            .getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            Glide.with(Main.this)
+                                                    .load(uri)
+                                                    .into(tmp2);
+                                            Toast.makeText(Main.this,"이미지 불러오기 성공",Toast.LENGTH_SHORT).show();
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            System.out.println(e);
+                                            Toast.makeText(Main.this,"이미지 불러오기 실패",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+
                                 // 기록장 미리보기 화면 띄우기
                                 // if(slidePage.getVisibility()==View.GONE){ }
                                 ShowLayout(slidePage, slideButtons);
@@ -1094,12 +1122,12 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         mOptions.position(point);
         // 마커 아이콘 변경 (비트맵 이미지만 가능)
         if(type ==0 ){ // 기록장 표시 마커
-            mOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_leaf_32));
+            mOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_dm_green_32));
             // 마커 추가
             mMap.addMarker(mOptions);
         }
         else{ // 검색한 위치 표시 마커
-            mOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_leaf2_32));
+            mOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_dm_green_32));
             // 마커 추가
             searchMarker=mMap.addMarker(mOptions);
         }

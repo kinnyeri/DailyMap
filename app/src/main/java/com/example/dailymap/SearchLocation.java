@@ -707,7 +707,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
         mOptions.snippet(snippet);
         mOptions.position(point);
         // 마커 아이콘 변경 (비트맵 이미지만 가능)
-        mOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_leaf2_32));
+        mOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_dm_green_32));
         // 마커 추가
         searchMarker =mMap.addMarker(mOptions);
 

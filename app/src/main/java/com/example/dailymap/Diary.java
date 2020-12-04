@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -26,6 +29,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class Diary extends AppCompatActivity {
@@ -43,6 +48,9 @@ public class Diary extends AppCompatActivity {
     private StorageReference storageRef;
     //DiaryGroup 정보 유지
     String curDG;
+
+    private Geocoder geocoder = new Geocoder(this);;
+    String address= null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +76,13 @@ public class Diary extends AppCompatActivity {
         String locY = intent.getExtras().getString("locationY");
         String feels = intent.getExtras().getString("feel");
         //String location = intent.getStringExtra("mLocation");
-        loc.setText(locX+", "+locY);
+        // 역지오코딩 : 위도, 경도 -> 주소
+        LatLng latLng = new LatLng(Double.parseDouble(locX), Double.parseDouble(locY));
+        Address addr= ReverseGeocoding(latLng);
+        if(addr!=null){
+            address= addr.getAddressLine(0); // 주소
+        }
+        loc.setText(address);
         switch (feels){
             case "0":
                 feel.setImageResource(feelThumbs[0]); break;
@@ -101,5 +115,32 @@ public class Diary extends AppCompatActivity {
             }
         });
         Toast.makeText(Diary.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
+    }
+
+    //역지오코딩 (위도,경도 -> 주소,지명)
+    private Address ReverseGeocoding(LatLng point){
+        Address address;
+        List<Address> list = null;
+        try {
+            double d1 = point.latitude;
+            double d2 = point.longitude;
+            list = geocoder.getFromLocation(
+                    d1, // 위도
+                    d2, // 경도
+                    10); // 얻어올 값의 개수
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("입출력 오류 - 서버에서 주소변환시 에러발생");
+        }
+        if (list != null) {
+            if (list.size()==0) {
+                System.out.println("해당되는 주소 정보는 없습니다");
+            } else {
+                System.out.println(list.get(0).toString());
+                address= list.get(0);
+                return address;
+            }
+        }
+        return null;
     }
 }
