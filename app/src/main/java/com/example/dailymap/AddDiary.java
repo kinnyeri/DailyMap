@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -57,7 +58,6 @@ public class AddDiary extends AppCompatActivity {
     double latitude, longitude; // 위도, 경도
 
     //Auth
-    private FirebaseAuth mAuth;
     private FirebaseUser user;
     //CFS
     private FirebaseFirestore db;
@@ -76,6 +76,7 @@ public class AddDiary extends AppCompatActivity {
         setContentView(R.layout.activity_add_diary);
         //DiaryGroup 정보 유지
         curDG = getIntent().getStringExtra("curDG"); //main 받아온거 사용
+        Log.d("DM","현재 DG : "+curDG);
 
         //CFS
         db = FirebaseFirestore.getInstance(); //Init Firestore
@@ -97,14 +98,6 @@ public class AddDiary extends AppCompatActivity {
             date.setText(year+"/"+month+"/"+day);
         }
 
-        callbackMethod = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int tyear, int tmonth, int tday) {
-                year = tyear; month=tmonth+1; day=tday;
-                date.setText(year+"/"+month+"/"+day);
-            }
-        };
-
         date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -115,7 +108,14 @@ public class AddDiary extends AppCompatActivity {
                 dialog.show();
             }
         });
-
+        callbackMethod = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int tyear, int tmonth, int tday) {
+                year = tyear; month=tmonth+1; day=tday;
+                date.setText(year+"/"+month+"/"+day);
+                Log.d("DM","날짜 선택 완료");
+            }
+        };
         //View 할당
         imgContent = (ImageView)findViewById(R.id.editImg);
         submit = (ImageView)findViewById(R.id.editSubmit);
@@ -146,12 +146,12 @@ public class AddDiary extends AppCompatActivity {
             LatLng latLng = new LatLng(latitude,longitude);
             place.setText(location);
             newD.setLocation(latitude,longitude);
-            System.out.println(latLng);
+            Log.d("DM","장소 로딩 완료");
+
         }
         place.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"장소 추가!!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(AddDiary.this, SearchLocation.class);
                 startActivityForResult(intent,REQ_ADD_CONTACT);
             }
@@ -164,7 +164,7 @@ public class AddDiary extends AppCompatActivity {
                 boolean clicked = false;
                 @Override
                 public void onClick(View view) {
-                    newD.feel = -1; //-1: 기분 안눌림;
+                    newD.feel = 0;
                     for(int i=0;i<feels.length;i++){
                         feels[i].setBackgroundColor(Color.WHITE);
                         if(feelsCnt==i){
@@ -173,14 +173,14 @@ public class AddDiary extends AppCompatActivity {
                             newD.feel=feelsCnt;
                         }
                     }
-                    Toast.makeText(getApplicationContext(),"feels "+newD.feel, Toast.LENGTH_SHORT).show();
+                    Log.d("DM","기분 바뀜");
                 }
             });
             //Submit
             submit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(newD.feel!=-1 &&newD.img!=null){
+                    if(newD.img!=null){
                         //내용 저장
                         String[] tmp={month+"",day+""};
                         if(tmp[0].length()<2) tmp[0]="0"+tmp[0];
@@ -189,16 +189,13 @@ public class AddDiary extends AppCompatActivity {
                         newD.setContent(content.getText().toString()); //내용 저장
                         addImgToStorage(tmpUri,newD.getImg()); //이미지 저장소에 올리기
                         addNewContent(); //기록 저장
-                        Toast.makeText(getApplicationContext(),"feel final "+newD.feel, Toast.LENGTH_SHORT).show();
-
-                        Toast.makeText(getApplicationContext(),"Submit OK", Toast.LENGTH_SHORT).show();
                     } else{
                         Toast.makeText(getApplicationContext(),"기분이나 사진도 선택해주세요.", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
         }
-        Toast.makeText(AddDiary.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
+        Toast.makeText(AddDiary.this,"현재 : "+curDG,Toast.LENGTH_SHORT).show();
     }
     private void addNewContent(){
         db.collection("DiaryGroupList").document(curDG)
@@ -207,36 +204,34 @@ public class AddDiary extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(AddDiary.this,"Diary Add SUCC",Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getApplicationContext(),Main.class);
                         intent.putExtra("curDG",curDG);
+                        Log.d("DM","기록 저장 완료");
+                        Toast.makeText(getApplicationContext(),"다이어리 등록", Toast.LENGTH_SHORT).show();
                         startActivity(intent); //추가와 동시에 메인페이지로 이동
                     }
                 });
     }
     private  void addImgToStorage(Uri tmpUri,String imgName){
         Uri file = Uri.fromFile(new File(getPath(tmpUri)));
-        Toast.makeText(AddDiary.this,getPath(tmpUri),Toast.LENGTH_SHORT).show();
         //이미지 경로 : curDG
         StorageReference ref = storageRef.child(curDG).child(imgName);
-        Toast.makeText(AddDiary.this,file.getLastPathSegment(),Toast.LENGTH_SHORT).show();
 
         // Register observers to listen for when the download is done or if it fails
         ref.putFile(tmpUri).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle unsuccessful uploads
-                int errorCode = ((StorageException) exception).getErrorCode();
-                String errorMessage = exception.getMessage();
-                Toast.makeText(AddDiary.this,"fail uploading imgfile",Toast.LENGTH_SHORT).show();
-                Toast.makeText(AddDiary.this,errorMessage,Toast.LENGTH_LONG).show();
+                Log.d("DM","사진 저장 실패");
+                Toast.makeText(AddDiary.this,"사진 저장 실패",Toast.LENGTH_LONG).show();
 
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                Toast.makeText(AddDiary.this,"SUCCESS uploading imgfile",Toast.LENGTH_SHORT).show();
+                Log.d("DM","사진 저장 성공");
+
             }
         });
     }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +75,7 @@ public class DiaryGroupManager extends AppCompatActivity {
         setContentView(R.layout.activity_diary_group_manager);
         //다이어리 정보 유지
         curDG = getIntent().getStringExtra("curDG");
+        Log.d("DM","현재 DG : "+curDG);
 
         userListView=findViewById(R.id.userList);
         manageOk=findViewById(R.id.manageOk);
@@ -85,10 +87,9 @@ public class DiaryGroupManager extends AppCompatActivity {
         emailIV = findViewById(R.id.change_email_state); // 이메일 입력창 우측 아이콘
         user = FirebaseAuth.getInstance().getCurrentUser();
 
-        //dgKey = FirebaseAuth.getInstance().getCurrentUser().getUid()+"000";
         db = FirebaseFirestore.getInstance();
         Toast.makeText(this,"현재 "+curDG,Toast.LENGTH_SHORT).show();
-        System.out.println(curDG+"============================");
+
         db.collection("DiaryGroupList").document(curDG)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -101,7 +102,8 @@ public class DiaryGroupManager extends AppCompatActivity {
                                 String tmp = document.getData().get("userList").toString();
                                 tmp=tmp.replace("[","").replace("]","").replace(" ","");
                                 list = tmp.split(",");
-                                Toast.makeText(DiaryGroupManager.this,list.length+"",Toast.LENGTH_LONG).show();
+                                Log.d("DM","사용자 목록 불러오기 성공");
+
                             } else{
                                 Toast.makeText(DiaryGroupManager.this,"no docs",Toast.LENGTH_LONG).show();
                                 list[0]="error";
@@ -153,7 +155,8 @@ public class DiaryGroupManager extends AppCompatActivity {
                     // @@사용자 공유 다이어리 목록 업데이트
                     updateDGList(user.getUid(), curDG);
                     updateDiaryGroup(user.getUid(), curDG);
-                    Toast.makeText(getApplicationContext(),"Submit OK", Toast.LENGTH_SHORT).show();
+                    Log.d("DM","새 사용자 등록 완료");
+
                     Intent intent = new Intent(getApplicationContext(),Account.class);
                     intent.putExtra("curDG",curDG);
                     startActivity(intent); //추가와 동시에 메인페이지로 이동
@@ -162,16 +165,12 @@ public class DiaryGroupManager extends AppCompatActivity {
                 else{
                     Toast.makeText(getApplicationContext(),"이메일을 적어주세요", Toast.LENGTH_SHORT).show();
                 }
-                Toast.makeText(getApplicationContext(),"Manage OK", Toast.LENGTH_SHORT).show();
-//                Intent intent = new Intent(DiaryGroupManager.this,Account.class);
-//                startActivity(intent);
             }
         });
     }
 
     private void updateDGList(String uid,final String name) {
         for (int i = 0; i < emailList.size(); i++) {
-            System.out.println("emailList!!!!"+emailList.get(i));
             db.collection("UserList").whereEqualTo("email", emailList.get(i))
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -179,9 +178,7 @@ public class DiaryGroupManager extends AppCompatActivity {
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                             if (task.isSuccessful()) {
                                 for (QueryDocumentSnapshot document : task.getResult()) {
-                                    db.collection("UserList").whereEqualTo("update DGLIST!!!!!",document.getData().get("email").toString() );
                                     document.getReference().update("diaryGroupList", FieldValue.arrayUnion(name));
-                                    System.out.println("++++"+document.getData().get("email").toString());
                                 }
                             }
                         }
@@ -192,7 +189,6 @@ public class DiaryGroupManager extends AppCompatActivity {
 
     private void updateDiaryGroup(String uid, String name){
         for(int i=0; i<emailList.size();i++){
-            System.out.println("update diary group!!!!"+emailList.get(i));
             db.collection("DiaryGroupList").document(name)
                     .update("userList",FieldValue.arrayUnion(emailList.get(i)));
         }

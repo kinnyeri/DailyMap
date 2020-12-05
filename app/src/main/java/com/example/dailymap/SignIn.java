@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.SingleLineTransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -45,7 +46,6 @@ public class SignIn extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if(user!=null){
-            Toast.makeText(SignIn.this,"user init",Toast.LENGTH_LONG).show();
             Intent intent = new Intent(getApplicationContext(),Main.class);
             startActivity(intent);
         }
@@ -110,23 +110,21 @@ public class SignIn extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Toast.makeText(SignIn.this, "success", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SignIn.this, "로그인 완료", Toast.LENGTH_SHORT).show();
 
                             //Database에 저장
                             String key = user.getDisplayName()+"'s diary"; //다이어리 이름으로 document 아이디 설정
                             addNewUser(new User(user.getDisplayName(),user.getEmail()),key,user.getUid());
+                            Log.d("DM","로그인 성공");
 
                             //UI 업데이트
                             Intent intent = new Intent(getApplicationContext(),Main.class);
-
-
                             intent.putExtra("curDG",key);
                             startActivity(intent);
                             finish();
-                            //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user
-                            Toast.makeText(SignIn.this, "sorry auth failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SignIn.this, "로그인 실패", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -144,32 +142,16 @@ public class SignIn extends AppCompatActivity {
                         DocumentSnapshot document = task.getResult();
                         if(!document.exists()){
                             document.getReference().set(tmp);
-                            Toast.makeText(SignIn.this,"USER SUCC",Toast.LENGTH_SHORT).show();
-
                             db.collection("DiaryGroupList").document(key)
                                     .set(new DiaryGroup(tmp.email))
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void v) {
-                                            Toast.makeText(SignIn.this,"DG SUCC",Toast.LENGTH_SHORT).show();
+                                            Log.d("DM","사용자 정보 저장 성공");
                                         }
                                     });
                         }
                     }
                 });
-//                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void v) {
-//                        Toast.makeText(SignIn.this,"USER SUCC",Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//        db.collection("DiaryGroupList").document(tmp.name+"'s diary")
-//                .set(new DiaryGroup(tmp.email))
-//                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void v) {
-//                        Toast.makeText(SignIn.this,"DG SUCC",Toast.LENGTH_SHORT).show();
-//                    }
-//                });
     }
 }

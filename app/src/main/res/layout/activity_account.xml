@@ -17,8 +17,10 @@
             android:id="@+id/account"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true">
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp">
             <ImageView
+                android:id="@+id/user_profile"
                 android:layout_width="85dp"
                 android:layout_height="85dp"
                 android:background="@drawable/bg_round"
@@ -54,14 +56,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_below="@id/account"
-            android:layout_marginTop="20dp">
+            android:layout_marginBottom="10dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:text="현재"
                 android:paddingRight="10dp"
-                android:textSize="20sp"
-                android:gravity="center"/>
+                android:textSize="18sp"
+                android:gravity="center"
+                android:layout_gravity="center"/>
             <Spinner
                 android:id="@+id/spinner"
                 android:layout_width="wrap_content"
@@ -71,8 +74,8 @@
             </Spinner>
             <ImageView
                 android:id="@+id/listSubmit"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:scaleType="centerInside"
                 android:background="@color/mainColor"
                 android:layout_gravity="center"
@@ -82,42 +85,29 @@
             android:id="@+id/manageDiary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_below="@id/currDiaryList">
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/diaryGroupManager"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Diary"
-                android:textSize="20sp"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
-                android:gravity="center_horizontal"/>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_weight="1">
-
-                <TextView
-                    android:id="@+id/diaryGroupManager"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="관리"
-                    android:textSize="18sp"
-                    android:gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:paddingLeft="8dp"/>
-                <TextView
-                    android:id="@+id/makeDiaryGroup_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="공유 다이어리 생성"
-                    android:gravity="center_vertical"
-                    android:textSize="18sp"
-                    android:paddingLeft="8dp"/>
-            </LinearLayout>
+                android:text="공유 다이어리 관리"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/button_account"/>
+            <TextView
+                android:id="@+id/makeDiaryGroup_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="공유 다이어리 추가"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:padding="8dp"
+                android:background="@drawable/button_account"/>
         </LinearLayout>
-
     </RelativeLayout>
 </RelativeLayout>

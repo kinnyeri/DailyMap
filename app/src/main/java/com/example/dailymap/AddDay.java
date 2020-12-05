@@ -38,7 +38,6 @@ public class AddDay implements DayViewDecorator {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                //Toast.makeText(Calendar2.this,document.getData().get("date").toString(),Toast.LENGTH_LONG).show();
                                 calendar = Calendar.getInstance();
                                 dates = new ArrayList<>();
                                 data = document.getData().get("date").toString();
@@ -59,12 +58,11 @@ public class AddDay implements DayViewDecorator {
                     }
 
                 });
+        Log.d("DM","날짜 기반 다이어리 데이터 연동 완료");
     }
 
     @Override
     public boolean shouldDecorate(CalendarDay day) {
-        Log.i("test1", dates + "");
-        Log.i("test2", day + "");
         return false;
     }
 

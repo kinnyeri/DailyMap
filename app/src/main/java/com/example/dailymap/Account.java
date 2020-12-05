@@ -4,7 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,6 +26,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class Account extends AppCompatActivity {
 
     TextView name,logout,dgManager,makeDiaryGroup_btn;
@@ -31,7 +40,9 @@ public class Account extends AppCompatActivity {
     FirebaseFirestore db;
     //DiaryGroup 정보 유지
     String curDG;
-    ImageView listSubmit;
+    ImageView listSubmit,user_profile;
+    FirebaseAuth auth;
+    Bitmap profileImg;
 
     @Override
     protected void onStart() {
@@ -43,7 +54,6 @@ public class Account extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         curDG= getIntent().getStringExtra("curDG");
-        Toast.makeText(getApplicationContext(),"on NEW INTENT",Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -57,18 +67,52 @@ public class Account extends AppCompatActivity {
         spinner=findViewById(R.id.spinner);
         listSubmit=findViewById(R.id.listSubmit);
         makeDiaryGroup_btn=findViewById(R.id.makeDiaryGroup_btn);
+        user_profile =findViewById(R.id.user_profile);
 
         db = FirebaseFirestore.getInstance();
 
         //DiaryGroup 정보 유지
         curDG = getIntent().getStringExtra("curDG"); //main 받아온거 사용
+        Log.d("DM","현재 DG : "+curDG);
 
+        //로그인 정보
         GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
         if(signInAccount!=null){
             name.setText(signInAccount.getDisplayName());
         }
-        String uid = FirebaseAuth.getInstance().getUid();
 
+        auth = FirebaseAuth.getInstance();
+
+        //user profile 가져오기
+        Thread getProfileThread = new Thread(){
+            FirebaseUser user = auth.getCurrentUser();
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    URL url = new URL(user.getPhotoUrl().toString());
+                    HttpURLConnection conn =(HttpURLConnection) url.openConnection();
+                    conn.setDoInput(true);
+
+                    InputStream is = conn.getInputStream();
+                    profileImg = BitmapFactory.decodeStream(is);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }; getProfileThread.start();
+        try {
+            getProfileThread.join();
+            user_profile.setImageBitmap(profileImg);
+            Toast.makeText(getApplicationContext(),"get img succ",Toast.LENGTH_SHORT).show();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+        //user list 가져오기
+        String uid = auth.getUid();
         db.collection("UserList").document(uid)
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     String list[];
@@ -83,6 +127,7 @@ public class Account extends AppCompatActivity {
                         for(int i=1;i<list.length;i++){
                             list[i]=list[i].replaceFirst(" ","");
                         }
+                        Log.d("DM","사용자 목록 가져옴");
                     }else{
                         Toast.makeText(Account.this,"no docs",Toast.LENGTH_LONG).show();
                     }
@@ -93,7 +138,6 @@ public class Account extends AppCompatActivity {
                 ArrayAdapter spinAdapter = new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_spinner_dropdown_item,list);
                 spinner.setAdapter(spinAdapter);
                 int pos = spinAdapter.getPosition(curDG);
-                Toast.makeText(getApplicationContext(),"현재 : "+pos,Toast.LENGTH_SHORT).show();
                 spinner.setSelection(pos);
             }
         });
@@ -113,7 +157,7 @@ public class Account extends AppCompatActivity {
         logout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Toast.makeText(Account.this,"SignOut Start",Toast.LENGTH_SHORT).show();
+                Log.d("DM","로그아웃 시작");
                 FirebaseAuth.getInstance().signOut(); //Firebase logout
                 Intent intent = new Intent(getApplicationContext(),SignIn.class);
                 startActivity(intent);
@@ -124,13 +168,13 @@ public class Account extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(Account.this,DiaryGroupManager.class);
                 intent.putExtra("curDG",curDG);
-                System.out.println("dgmanager++++++++++++++++++++++++++++++++++"+curDG);
                 startActivity(intent);
             }
         });
         listSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("DM","DG 바뀜");
                 Intent intent = new Intent(Account.this,Main.class);
                 intent.putExtra("curDG",curDG);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -146,7 +190,6 @@ public class Account extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        Toast.makeText(Account.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
-
+        Toast.makeText(Account.this,"현재 DG: "+curDG,Toast.LENGTH_SHORT).show();
     }
 }

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -64,6 +65,7 @@ public class DiaryList extends AppCompatActivity {
         //DiaryGroup 정보 유지
         Intent getIntent = getIntent();
         curDG = getIntent.getStringExtra("curDG");
+        Log.d("DM","현재 DG : "+curDG);
 
         strImg = new Vector<Map<String,Object>>();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -78,6 +80,8 @@ public class DiaryList extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"다이어리 정보가 없습니다.",Toast.LENGTH_LONG).show();
                 break;
             case MAP_DIARY_LIST:
+                Log.d("DM","장소 기반 다이어리 목록");
+
                 Double lat = getIntent.getDoubleExtra("mLatitude",0.1);
                 Double lon = getIntent.getDoubleExtra("mLongitude",0.1);
                 Toast.makeText(getApplicationContext(),lat+" , "+lon,Toast.LENGTH_LONG).show();
@@ -99,8 +103,11 @@ public class DiaryList extends AppCompatActivity {
                         }
                     }
                 });
+                Log.d("DM","성공");
                 break;
             case CALENDAR_DIARY_LIST:
+                Log.d("DM","달력 기반 다이어리 목록");
+
                 String y = getIntent.getIntExtra("year",0)+"";
                 int tmp = getIntent.getIntExtra("month",0);
                 String m = tmp<10 ? "0"+tmp : tmp+"";
@@ -117,14 +124,15 @@ public class DiaryList extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 imgLists.add(document.getData());
-                                Toast.makeText(DiaryList.this,"Succ",Toast.LENGTH_SHORT).show();
                             }
                             gv.setAdapter(new ImgAdapter(DiaryList.this,imgLists));
+                            Log.d("DM","이미지 목록 불러오기 성공");
                         } else {
                             Toast.makeText(DiaryList.this,"Failed to get img",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+                Log.d("DM","성공");
                 break;
         }
 
@@ -180,13 +188,11 @@ public class DiaryList extends AppCompatActivity {
                     Glide.with(DiaryList.this)
                             .load(uri)
                             .into(tmpIV);
-                    Toast.makeText(DiaryList.this,"iv updated !!!!!!!!!!!!!!!!!",Toast.LENGTH_LONG).show();
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     System.out.println(e);
-                    Toast.makeText(DiaryList.this,"iv failed !!!!!!!!!!!!!!",Toast.LENGTH_LONG).show();
                 }
             });
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);

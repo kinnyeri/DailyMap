@@ -34,7 +34,6 @@ import java.util.concurrent.Executor;
 
 public class Calendar2 extends AppCompatActivity {
     private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
-//    private final AddDay addday = new AddDay();
     MaterialCalendarView materialCalendarView;
 
     //DiaryGroup 정보 유지
@@ -49,14 +48,15 @@ public class Calendar2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
-        curDG=getIntent().getStringExtra("curDG"); // 이동이 있으면 intent에 붙여서 보내줘야함
+        //다어이리 유지
+        curDG=getIntent().getStringExtra("curDG");
+        Log.d("DM","현재 DG : "+curDG);
 
         materialCalendarView = (MaterialCalendarView) findViewById(R.id.calendarView);
         ImageButton add_btn = (ImageButton) findViewById(R.id.add_btn);
         add_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "기록장 추가 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Calendar2.this, AddDiary.class);
                 intent.putExtra("curDG",curDG);
                 startActivityForResult(intent,REQ_ADD_CONTACT);
@@ -84,15 +84,11 @@ public class Calendar2 extends AppCompatActivity {
                 int Month = date.getMonth() + 1;
                 int Day = date.getDay();
 
-                Log.i("Year test", Year + "");
-                Log.i("Month test", Month + "");
-                Log.i("Day test", Day + "");
-
                 String shot_Day = Year + "," + Month + "," + Day;
-
-                Log.i("shot_Day test", shot_Day + "");
                 materialCalendarView.clearSelection();
-                Toast.makeText(getApplicationContext(), "click "+shot_Day, Toast.LENGTH_SHORT).show();
+
+                Log.d("DM",shot_Day+" 선택, 해당 다이어리 리스트로 이동");
+
                 Intent intent = new Intent(Calendar2.this, DiaryList.class);
                 intent.putExtra("curDG",curDG);
                 intent.putExtra("code",CALENDAR_DIARY_LIST);
@@ -103,7 +99,7 @@ public class Calendar2 extends AppCompatActivity {
             }
         });
 
-        Toast.makeText(Calendar2.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
+        Toast.makeText(Calendar2.this,"현재 : "+curDG,Toast.LENGTH_SHORT).show();
 
 
         db = FirebaseFirestore.getInstance();
@@ -125,10 +121,7 @@ public class Calendar2 extends AppCompatActivity {
                                 CalendarDay day = CalendarDay.from(calendar);
                                 dates.add(day);
                                 materialCalendarView.addDecorator(new EventDecorator(Color.GRAY,dates,Calendar2.this));
-                                //여기 있은땐 모든 정보 받아와짐
                             }
-
-                            //여기서부터 처음것만
                         }
 
                     }

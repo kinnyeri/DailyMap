@@ -10,6 +10,7 @@ import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,6 +62,7 @@ public class Diary extends AppCompatActivity {
         setContentView(R.layout.activity_diary);
         //DiaryGroup 정보 유지
         curDG=getIntent().getStringExtra("curDG");
+        Log.d("DM","현재 DG : "+curDG);
 
         //CST
         storage= FirebaseStorage.getInstance("gs://daily-map-d47b1.appspot.com");
@@ -113,13 +115,12 @@ public class Diary extends AppCompatActivity {
                 Glide.with(Diary.this)
                         .load(uri)
                         .into(tmpIV);
-                Toast.makeText(Diary.this,"iv updated @@@@",Toast.LENGTH_LONG).show();
+                Log.d("DM","이미지 불러오기 성공");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 System.out.println(e);
-                Toast.makeText(Diary.this,"iv failed !@@@",Toast.LENGTH_LONG).show();
             }
         });
         //작성자
@@ -131,17 +132,16 @@ public class Diary extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             writter_tag.setText(document.getData().get("name").toString());
-                            Toast.makeText(Diary.this,"Succ",Toast.LENGTH_SHORT).show();
+
+                            Log.d("DM","작성자 정보 불러오기 성공");
                         }
                     } else {
-                        Toast.makeText(Diary.this,"Failed to get img",Toast.LENGTH_SHORT).show();
+
                     }
                 }
         });
-        Toast.makeText(Diary.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
+        Toast.makeText(Diary.this,"현재 : "+curDG,Toast.LENGTH_SHORT).show();
     }
-
-
     //역지오코딩 (위도,경도 -> 주소,지명)
     private Address ReverseGeocoding(LatLng point){
         Address address;
