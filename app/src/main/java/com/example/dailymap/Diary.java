@@ -9,6 +9,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +31,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +41,7 @@ public class Diary extends AppCompatActivity {
     ImageView feel;
     TextView date;
     TextView content;
+    TextView writter_tag;
 
     int []feelThumbs ={R.drawable.good,R.drawable.mid,R.drawable.bad};
     //FS
@@ -63,18 +66,24 @@ public class Diary extends AppCompatActivity {
         storage= FirebaseStorage.getInstance("gs://daily-map-d47b1.appspot.com");
         storageRef = storage.getReference();
 
+        //FST
+        db = FirebaseFirestore.getInstance(); //Init Firestore
+
         // view
         img=(ImageView) findViewById(R.id.diaryImg);
         loc=(TextView)findViewById(R.id.diaryLoc);
         feel=(ImageView)findViewById(R.id.diaryFeel);
         date=(TextView)findViewById(R.id.diaryDate);
         content=(TextView)findViewById(R.id.diaryContent);
+        writter_tag=(TextView)findViewById(R.id.writter_tag);
 
         //Intent
         Intent intent = getIntent();
         String locX = intent.getExtras().getString("locationX");
         String locY = intent.getExtras().getString("locationY");
         String feels = intent.getExtras().getString("feel");
+        String wriiter = intent.getExtras().getString("writter");
+
         //String location = intent.getStringExtra("mLocation");
         // 역지오코딩 : 위도, 경도 -> 주소
         LatLng latLng = new LatLng(Double.parseDouble(locX), Double.parseDouble(locY));
@@ -95,7 +104,6 @@ public class Diary extends AppCompatActivity {
         date.setText(tmpDate.substring(0,4)+"/"+tmpDate.substring(4,6)+"/"+tmpDate.substring(6,8));
         content.setText(intent.getExtras().getString("content"));
 
-        db = FirebaseFirestore.getInstance(); //Init Firestore
         //이미지 올리기
         storageRef.child(curDG+"/"+intent.getExtras().getString("img"))
                 .getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -114,8 +122,25 @@ public class Diary extends AppCompatActivity {
                 Toast.makeText(Diary.this,"iv failed !@@@",Toast.LENGTH_LONG).show();
             }
         });
+        //작성자
+        db.collection("UserList")
+                .whereEqualTo("email",wriiter)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            writter_tag.setText(document.getData().get("name").toString());
+                            Toast.makeText(Diary.this,"Succ",Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(Diary.this,"Failed to get img",Toast.LENGTH_SHORT).show();
+                    }
+                }
+        });
         Toast.makeText(Diary.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
     }
+
 
     //역지오코딩 (위도,경도 -> 주소,지명)
     private Address ReverseGeocoding(LatLng point){

@@ -189,6 +189,8 @@ public class AddDiary extends AppCompatActivity {
                         newD.setContent(content.getText().toString()); //내용 저장
                         addImgToStorage(tmpUri,newD.getImg()); //이미지 저장소에 올리기
                         addNewContent(); //기록 저장
+                        Toast.makeText(getApplicationContext(),"feel final "+newD.feel, Toast.LENGTH_SHORT).show();
+
                         Toast.makeText(getApplicationContext(),"Submit OK", Toast.LENGTH_SHORT).show();
                     } else{
                         Toast.makeText(getApplicationContext(),"기분이나 사진도 선택해주세요.", Toast.LENGTH_SHORT).show();
