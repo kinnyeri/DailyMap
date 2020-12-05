@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -78,7 +79,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
     private Geocoder geocoder;
     private FirebaseAuth mAuth; //auth
 
-    //++ ====================================
     private View mapView;
     private MapFragment mMapFragment;
     private View mMyLocationButtonView = null;
@@ -125,22 +125,23 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         curDG=getIntent().getExtras().getString("curDG");
+        Log.d("DM","현재 DG : "+curDG);
     }
 
     @Override //Auth 확인
     protected void onStart() {
         super.onStart();
         //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //에러 남 > 로그아웃 안됨
-        Toast.makeText(Main.this,"start",Toast.LENGTH_LONG).show();
         if(user!=null){ //login 중
+            Log.d("DM", "로그인 : " + user.getDisplayName());
             Toast.makeText(Main.this,user.getDisplayName(),Toast.LENGTH_SHORT).show();
         }
         else{ //user 없으면 signin page로 넘어가기
-            Toast.makeText(Main.this,"no one",Toast.LENGTH_LONG).show();
+            Log.d("DM", "no one");
             Intent intent = new Intent(getApplicationContext(),SignIn.class);
             startActivity(intent);
         }
-        // ++ ===============================================
+
         if (checkPermission()) {
 
             System.out.println("onStart : call mFusedLocationClient.requestLocationUpdates");
@@ -151,12 +152,12 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             //mMyLocationButtonView = mMapFragment.getView().findViewWithTag("GoogleMapMyLocationButton");
             //mMyLocationButtonView.setBackgroundColor(Color.GREEN);
         }
-        // ==================================================
+
         //다이어리 정보 유지
         curDG = getIntent().getStringExtra("curDG"); //signin에서 받아온거 사용
-        Toast.makeText(Main.this,"1현재 : "+curDG,Toast.LENGTH_LONG).show();
+        Log.d("DM","현재 DG : "+curDG);
         if(curDG==null) curDG = user.getDisplayName()+"'s diary";
-        Toast.makeText(Main.this,"현재 : "+curDG,Toast.LENGTH_LONG).show();
+        Log.d("DM","현재 DG : "+curDG);
 
         // DB에서 현재 DiaryGroup의 diaryList 정보 가져오기
         db.collection("DiaryGroupList").document(curDG)
@@ -168,13 +169,10 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         dataList.add(document.getData());
-                        System.out.println(curDG+ "dataList!!!!!: "+dataList);
-                        System.out.println(curDG+ "- 위도: "+dataList.get(dataList.size()-1).get("locationX"));
-                        System.out.println(curDG+ "- 경도: "+dataList.get(dataList.size()-1).get("locationY"));
                     }
                     addMarkerFromDB(dataList);
                 } else {
-                    Toast.makeText(Main.this,"Failed to get img",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Main.this,"Failed to get diaryList",Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -200,14 +198,13 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         builder.addLocationRequest(locationRequest);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        // ====================================
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapView = mapFragment.getView();
         mapFragment.getMapAsync(this);
 
-
+        Toast.makeText(Main.this,"현재 DG: "+curDG,Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -216,7 +213,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         mMap = googleMap;
         geocoder = new Geocoder(this);
 
-        // ++ ====================================================
         //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
         //지도의 초기위치를 서울로 이동
         setDefaultLocation();
@@ -283,9 +279,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             layoutParams.setMargins(1500, 0, 50, 150);
         }
 
-        // ====================================================
-
-
         LatLng SEOUL = new LatLng(37.57, 126.97);
         // 마커 추가 ( DB에서 가져오기 전 테스트 용이었음 )
         //AddMarker("경복궁","투어&박물관이 있는 역사적인 궁전",SEOUL);
@@ -326,8 +319,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 diaryLists.add(document.getData());
-                                System.out.println(curDG+ "diaryLists!!!!!: "+diaryLists);
-                                System.out.println("contents!!"+ diaryLists.get(diaryLists.size()-1).get("content"));
+                                Log.d("DM", "마커에 해당하는 기록장 정보 DB에서 가져옴");
                                 placeText.setText(marker.getSnippet());
                                 diaryNum.setText("기록 +" + diaryLists.size());
 
@@ -336,12 +328,10 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                             // 해당 마커 위치에 기록장 정보가 없는 경우
                             if(diaryLists.size()<=0){
                                 Toast.makeText(Main.this,"클릭하신 마커 위치에는 기록장이 없습니다..",Toast.LENGTH_LONG).show();
-                                System.out.println("클릭한 마커 정보 dairylist Size 0!!!"+marker.getSnippet());
                             }
                             // 해당 마커 위치에 기록장 정보가 있는 경우
                             else{
                                 // 사진 불러오기
-                                //Storage
                                 storage= FirebaseStorage.getInstance("gs://daily-map-d47b1.appspot.com");
                                 storageRef = storage.getReference();
 
@@ -358,13 +348,13 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                                         Glide.with(Main.this)
                                                 .load(uri)
                                                 .into(tmp1);
-                                        Toast.makeText(Main.this,"이미지 불러오기 성공",Toast.LENGTH_SHORT).show();
+                                        Log.d("DM", "Cloud Storage 이미지 불러오기 성공");
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         System.out.println(e);
-                                        Toast.makeText(Main.this,"이미지 불러오기 실패",Toast.LENGTH_SHORT).show();
+                                        Log.d("DM", "Cloud Storage 이미지 불러오기 실패");
                                     }
                                 });
 
@@ -378,13 +368,13 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                                             Glide.with(Main.this)
                                                     .load(uri)
                                                     .into(tmp2);
-                                            Toast.makeText(Main.this,"이미지 불러오기 성공",Toast.LENGTH_SHORT).show();
+                                            Log.d("DM", "Cloud Storage 이미지 불러오기 성공");
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             System.out.println(e);
-                                            Toast.makeText(Main.this,"이미지 불러오기 실패",Toast.LENGTH_SHORT).show();
+                                            Log.d("DM", "Cloud Storage 이미지 불러오기 실패");
                                         }
                                     });
                                 }
@@ -392,17 +382,17 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                                 // 기록장 미리보기 화면 띄우기
                                 // if(slidePage.getVisibility()==View.GONE){ }
                                 ShowLayout(slidePage, slideButtons);
-                                System.out.println("클릭한 마커 정보!!!"+marker.getSnippet());
 
+                                // 클릭한 마커 정보
                                 clickLocation= marker.getSnippet();
                                 clickLatitude = marker.getPosition().latitude;
                                 clickLongitude = marker.getPosition().longitude;
-
+                                Log.d("DM", "클릭한 마커 정보 : ("+ clickLatitude+","+clickLongitude);
                             }
 
                         } else {
-                            System.out.println("Failed to get img");
-                            Toast.makeText(Main.this,"Failed to get img",Toast.LENGTH_SHORT).show();
+                            System.out.println("Failed to get marker DB data");
+                            Toast.makeText(Main.this,"Failed to get marker DB data",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -465,7 +455,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         });
     }
 
-    // ++ ===================================================
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -507,8 +496,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    // ++ ===================================================
-
     public void addMarkerFromDB(ArrayList<Map<String,Object>> data){
         for(int i=0; i<data.size(); i++){
             double latitude; // 위도
@@ -517,7 +504,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             longitude = (double) data.get(i).get("locationY");
 
             LatLng latLng = new LatLng(latitude, longitude);
-            System.out.println(latitude+", " +longitude);
+
             Address addr= ReverseGeocoding(latLng);
 
             if(addr!=null){
@@ -599,7 +586,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         List<Address> addresses;
 
         try {
-
             addresses = geocoder.getFromLocation(
                     latlng.latitude,
                     latlng.longitude,
@@ -781,10 +767,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-
-    // ===================================================
-
-
     // 메인화면 UI 핸들러
     public void MainUIBtnHandler(){
         // 메인화면 버튼 클릭 이벤트
@@ -793,7 +775,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         accountButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"계정관리 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,Account.class);
                 //다이어리 정보 유지
                 intent.putExtra("curDG",curDG);
@@ -806,7 +787,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         calendarButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"달력 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,Calendar2.class);
                 //다이어리 정보 유지
                 intent.putExtra("curDG",curDG);
@@ -819,7 +799,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         addButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"기록장 추가 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,AddDiary.class);
                 //다이어리 정보 유지
                 intent.putExtra("curDG",curDG);
@@ -829,7 +808,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                     mLocation = searchMarker.getSnippet();
                     mLatitude = searchMarker.getPosition().latitude;
                     mLongitude = searchMarker.getPosition().longitude;
-                    System.out.println("검색한 장소 위치값 디폴트로 넘겨줌!!! "+mLocation);
+                    Log.d("DM", "검색한 장소 위치값 디폴트로 넘겨줌");
                 }
                 // 검색한 장소가 없다면 현재위치를 디폴트 값으로 넘겨주기
                 else if(searchMarker==null){
@@ -841,9 +820,9 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                     mLocation = address;
                     mLatitude = currentPosition.latitude;
                     mLongitude = currentPosition.longitude;
-                    System.out.println("현재 위치값 디폴트로 넘겨줌!!! "+mLocation);
+                    Log.d("DM", "현재 위치값 디폴트로 넘겨줌");
                 }
-                System.out.println("위도, 경도 : "+ mLatitude+ ", " +mLongitude);
+                Log.d("DM", "위도, 경도 : "+ mLatitude+ ", " +mLongitude);
                 intent.putExtra("mLocation", mLocation);
                 intent.putExtra("mLatitude", mLatitude);
                 intent.putExtra("mLongitude", mLongitude);
@@ -857,7 +836,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         addButton_slide.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"슬라이딩 패널 기록장 추가 버튼", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,AddDiary.class);
                 //다이어리 정보 유지
                 intent.putExtra("curDG",curDG);
@@ -865,7 +843,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 mLocation = clickLocation;
                 mLatitude = clickLatitude;
                 mLongitude = clickLongitude;
-                System.out.println("클릭한 마커 위치값 디폴트로 넘겨줌!!! "+mLocation);
+                Log.d("DM", "클릭한 마커 위치값 디폴트로 넘겨줌");
+                Log.d("DM", "위도, 경도 : "+ mLatitude+ ", " +mLongitude);
                 intent.putExtra("mLocation", mLocation);
                 intent.putExtra("mLatitude", mLatitude);
                 intent.putExtra("mLongitude", mLongitude);
@@ -879,7 +858,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         slidingPanel.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                Toast.makeText(getApplicationContext(),"슬라이딩 패널 클릭", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Main.this,DiaryList.class);
                 //다이어리 정보 유지
                 intent.putExtra("curDG",curDG);
@@ -888,7 +866,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 mLocation = clickLocation;
                 mLatitude = clickLatitude;
                 mLongitude = clickLongitude;
-                System.out.println("클릭한 마커 위치값 디폴트로 넘겨줌!!! "+mLocation);
+
                 intent.putExtra("mLocation", mLocation);
                 intent.putExtra("mLatitude", mLatitude);
                 intent.putExtra("mLongitude", mLongitude);
@@ -896,10 +874,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                 startActivity(intent);
             }
         });
-
-        //+========================================================
-        //+=========================================================
-
     }
 
     // 검색 핸들러
@@ -931,7 +905,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
 
                     // 지오코딩 (주소,지명 -> 위도,경도)
                     String searchAddress =searchBox.getText().toString();
-                    System.out.println(searchAddress);
 
                     Address addr = Geocoding(searchAddress);
 
@@ -939,15 +912,11 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                         // 지오코딩 반환값 처리
                         String []splitStr = addr.toString().split(",");
                         String address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1,splitStr[0].length() - 2); // 주소
-                        System.out.println(address);
 
                         String latitude = splitStr[10].substring(splitStr[10].indexOf("=") + 1); // 위도
                         String longitude = splitStr[12].substring(splitStr[12].indexOf("=") + 1); // 경도
-                        System.out.println(latitude);
-                        System.out.println(longitude);
 
                         String locationName = addr.getFeatureName(); // 주소 이름
-                        System.out.println(locationName);
 
                         LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)); // 좌표(위도, 경도) 생성
 
@@ -958,9 +927,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                         // 해당 좌표로 화면 줌
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point,15));
                     }
-
-                    // 토스트 메시지 띄우기 (검색창 텍스트 내용)
-                    Toast.makeText(getApplicationContext(),searchBox.getText()+"구글맵 검색!!", Toast.LENGTH_LONG).show();
 
                     // 검색창 내용 초기화
                     //searchBox.getText().clear();
@@ -1011,6 +977,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
 
     //역지오코딩 (위도,경도 -> 주소,지명)
     private Address ReverseGeocoding(LatLng point){
+        Log.d("DM", "역지오코딩(위도,경도 -> 주소,지명)");
         Address address;
 
         List<Address> list = null;
@@ -1030,7 +997,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             if (list.size()==0) {
                 System.out.println("해당되는 주소 정보는 없습니다");
             } else {
-                System.out.println(list.get(0).toString());
+                Log.d("DM", "역지오코딩 성공 :"+list.get(0).toString());
                 address= list.get(0);
                 return address;
             }
@@ -1040,6 +1007,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
 
     // 지오코딩 (주소,지명 -> 위도,경도)
     private Address Geocoding(String searchAddress){
+        Log.d("DM", "지오코딩 (주소,지명 -> 위도,경도)");
         Address address;
         List<Address> list = null;
 
@@ -1056,7 +1024,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             if (list.size() == 0) {
                 System.out.println("해당되는 주소 정보는 없습니다");
             } else {
-                System.out.println("성공!!!:"+list.get(0).toString());
+                Log.d("DM", "지오코딩 성공 :"+list.get(0).toString());
                 address= list.get(0);
                 return address;
             }
@@ -1138,7 +1106,5 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             searchMarker=mMap.addMarker(mOptions);
         }
 
-        // 추가한 마커 정보 표시
-        // marker.showInfoWindow();
     }
 }

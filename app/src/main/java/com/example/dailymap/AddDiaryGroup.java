@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -59,6 +60,7 @@ public class AddDiaryGroup extends AppCompatActivity {
         setContentView(R.layout.activity_add_diary_group);
         //DiaryGroup 정보 유지
         curDG=getIntent().getStringExtra("curDG");
+        Log.d("DM","현재 DG : "+curDG);
 
         db = FirebaseFirestore.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -90,8 +92,6 @@ public class AddDiaryGroup extends AppCompatActivity {
 
                     numAddEmail++; // 공유하는 계정 수 +1
 
-                    Toast.makeText(getApplicationContext(), emailList.size()+", "+ emailList.get(numAddEmail), Toast.LENGTH_SHORT).show();
-
                     LayoutInflater mInflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
                     LinearLayout mRootLinear =(LinearLayout)findViewById(R.id.linear_root);
 
@@ -116,7 +116,7 @@ public class AddDiaryGroup extends AppCompatActivity {
                     addNewDiaryGroup(user.getUid(), getName);
                     // @@사용자 공유 다이어리 목록 업데이트
                     updateDGList(user.getUid(), getName);
-                    Toast.makeText(getApplicationContext(),"Submit OK", Toast.LENGTH_SHORT).show();
+
                     Intent intent = new Intent(getApplicationContext(),Main.class);
                     intent.putExtra("curDG",getName);
                     startActivity(intent); //추가와 동시에 메인페이지로 이동
@@ -145,8 +145,7 @@ public class AddDiaryGroup extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(AddDiaryGroup.this,"DiaryGroup Add SUCC",Toast.LENGTH_SHORT).show();
-
+                        Log.d("DM", "DiaryGroup Add 성공");
                     }
                 });
     }
@@ -160,7 +159,7 @@ public class AddDiaryGroup extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 document.getReference().update("diaryGroupList", FieldValue.arrayUnion(name));
-                                System.out.println("++++"+document.getData().get("email").toString());
+                                Log.d("DM", "공유 계정 추가: "+document.getData().get("email").toString());
                             }
                         }
                     }
