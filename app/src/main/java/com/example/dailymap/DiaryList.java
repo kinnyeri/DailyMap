@@ -48,6 +48,7 @@ public class DiaryList extends AppCompatActivity {
     public Vector<Map<String,Object>> strImg;
     GridView gv;
     ImageView iv;
+    TextView act_name;
     DisplayMetrics metrics;
     private FirebaseFirestore db;
     //CST
@@ -74,6 +75,7 @@ public class DiaryList extends AppCompatActivity {
         Toast.makeText(DiaryList.this,strImg.size()+" ?",Toast.LENGTH_SHORT).show();
 
         gv = (GridView) findViewById(R.id.gridList);
+        act_name =(TextView)findViewById(R.id.act_name);
 
         switch (getIntent.getIntExtra("code",0)){
             case 0:
@@ -81,7 +83,7 @@ public class DiaryList extends AppCompatActivity {
                 break;
             case MAP_DIARY_LIST:
                 Log.d("DM","장소 기반 다이어리 목록");
-
+                act_name.setText("장소 모음");
                 Double lat = getIntent.getDoubleExtra("mLatitude",0.1);
                 Double lon = getIntent.getDoubleExtra("mLongitude",0.1);
                 Toast.makeText(getApplicationContext(),lat+" , "+lon,Toast.LENGTH_LONG).show();
@@ -107,6 +109,7 @@ public class DiaryList extends AppCompatActivity {
                 break;
             case CALENDAR_DIARY_LIST:
                 Log.d("DM","달력 기반 다이어리 목록");
+                act_name.setText("시간 모음");
 
                 String y = getIntent.getIntExtra("year",0)+"";
                 int tmp = getIntent.getIntExtra("month",0);

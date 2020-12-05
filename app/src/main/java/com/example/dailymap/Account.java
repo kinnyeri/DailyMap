@@ -110,7 +110,7 @@ public class Account extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        
+
         //user list 가져오기
         String uid = auth.getUid();
         db.collection("UserList").document(uid)
