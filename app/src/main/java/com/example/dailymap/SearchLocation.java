@@ -190,8 +190,6 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(getApplicationContext(),"마커 클릭!!", Toast.LENGTH_SHORT).show();
-                System.out.println("마커 클릭!!!!");
 
                 // 마커 클릭한 경우
                 // 위치 정보 기록장 추가 화면으로 넘겨주기
@@ -222,35 +220,6 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                 final EditText searchBox= findViewById(R.id.edit_text);
                 HideKeyboard(searchBox);
 
-                // ReverseGeocoding 함수 : 역지오코딩 (위도,경도 -> 주소,지명)
-                // 반환값 예시
-                        /* Address[
-                                addressLines=[0:"대한민국 서귀포시 성산읍 성산 일출봉"],
-                                feature=성산 일출봉,
-                                admin=null,
-                                sub-admin=null,
-                                locality=서귀포시,
-                                thoroughfare=null,
-                                postalCode=699-900,
-                                countryCode=KR,
-                                countryName=대한민국,
-                                hasLatitude=true,latitude=33.458056000000006,
-                                hasLongitude=true,longitude=126.94250000000001,
-                                phone=null,url=null,
-                                extras=null]
-                         */
-                        /*
-                Address addr= ReverseGeocoding(point);
-
-                if(addr!=null){
-                    String locationName = addr.getFeatureName(); // 주소이름,
-                    String address = addr.getAddressLine(0); // 주소
-
-                    // 지도에서 클릭한 위치에 마커 추가
-                    AddMarker(locationName,address,point);
-                }
-
-                         */
             }
         });
     }
@@ -287,8 +256,6 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
     @Override
     protected void onStart() {
         super.onStart();
-
-        System.out.println("onStart");
 
         if (checkPermission()) {
 
@@ -602,8 +569,6 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point,15));
                     }
 
-                    // 토스트 메시지 띄우기 (검색창 텍스트 내용)
-                    Toast.makeText(getApplicationContext(),searchBox.getText()+"구글맵 검색!!", Toast.LENGTH_LONG).show();
 
                     // 검색창 내용 초기화
                     //searchBox.getText().clear();
