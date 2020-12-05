@@ -133,6 +133,7 @@ public class Account extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(Account.this,Main.class);
                 intent.putExtra("curDG",curDG);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
             }

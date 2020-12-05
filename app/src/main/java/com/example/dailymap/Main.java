@@ -121,6 +121,12 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
     private FirebaseStorage storage;
     private StorageReference storageRef;
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        curDG=getIntent().getExtras().getString("curDG");
+    }
+
     @Override //Auth 확인
     protected void onStart() {
         super.onStart();

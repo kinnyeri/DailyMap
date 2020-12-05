@@ -44,7 +44,6 @@
                     android:id="@+id/diaryLoc"
                     android:layout_width="350dp"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
                     android:text="제주 곽지해수욕장"
                     android:textSize="20dp"
                     android:padding="30px"
