@@ -119,6 +119,7 @@ public class AddDiaryGroup extends AppCompatActivity {
 
                     Intent intent = new Intent(getApplicationContext(),Main.class);
                     intent.putExtra("curDG",getName);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent); //추가와 동시에 메인페이지로 이동
                     finish();
                 } else if(getName.getBytes().length<=0 &&emailList.size()>1){

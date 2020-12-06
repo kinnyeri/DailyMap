@@ -120,6 +120,7 @@ public class SignIn extends AppCompatActivity {
                             //UI 업데이트
                             Intent intent = new Intent(getApplicationContext(),Main.class);
                             intent.putExtra("curDG",key);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
                             finish();
                         } else {

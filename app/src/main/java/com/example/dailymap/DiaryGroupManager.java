@@ -159,6 +159,7 @@ public class DiaryGroupManager extends AppCompatActivity {
 
                     Intent intent = new Intent(getApplicationContext(),Account.class);
                     intent.putExtra("curDG",curDG);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent); //추가와 동시에 메인페이지로 이동
                     finish();
                 }

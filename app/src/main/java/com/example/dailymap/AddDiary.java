@@ -206,9 +206,11 @@ public class AddDiary extends AppCompatActivity {
                     public void onSuccess(DocumentReference documentReference) {
                         Intent intent = new Intent(getApplicationContext(),Main.class);
                         intent.putExtra("curDG",curDG);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         Log.d("DM","기록 저장 완료");
                         Toast.makeText(getApplicationContext(),"다이어리 등록", Toast.LENGTH_SHORT).show();
                         startActivity(intent); //추가와 동시에 메인페이지로 이동
+                        finish();
                     }
                 });
     }
