@@ -134,7 +134,7 @@ public class DiaryGroupManager extends AppCompatActivity {
 
                     numAddEmail++; // 공유하는 계정 수 +1
 
-                    Toast.makeText(getApplicationContext(), emailList.size()+", "+ emailList.get(emailList.size()-1), Toast.LENGTH_SHORT).show();
+                    Log.d("DM", "공유 계정 추가: "+emailList.size()+", "+ emailList.get(emailList.size()-1));
 
                     LayoutInflater mInflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
                     LinearLayout mRootLinear =(LinearLayout)findViewById(R.id.linear_root);
