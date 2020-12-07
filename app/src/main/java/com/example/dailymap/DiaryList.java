@@ -97,7 +97,6 @@ public class DiaryList extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 imgLists.add(document.getData());
-                                Toast.makeText(DiaryList.this,"Succ",Toast.LENGTH_SHORT).show();
                             }
                             gv.setAdapter(new ImgAdapter(DiaryList.this,imgLists));
                         } else {
