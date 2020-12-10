@@ -274,7 +274,6 @@ public class AddDiary extends AppCompatActivity {
             SimpleDateFormat dateFormat=new SimpleDateFormat("yyMMddmmss");
             String date = dateFormat.format(new Date());
             newD.setImg("dm"+user.getUid()+date);//이미지 이름 저장
-            Toast.makeText(AddDiary.this,"img uri into tmpUri ",Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -44,10 +44,10 @@ public class ServiceThread extends Thread{
     }
 
     public void run(){
-        if(isRun){
+        if(isRun&&curDG!=null){
             // DB 리스너 - "20년 잘가" 다이어리 상태 리스닝 >> curDG로 변경 필요
             System.out.println("ServiceTest(Thread): "+ curDG);
-            db.collection("DiaryGroupList").document("20년 잘가")
+            db.collection("DiaryGroupList").document(curDG)
                     .collection("diaryList")
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override

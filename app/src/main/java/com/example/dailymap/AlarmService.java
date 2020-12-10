@@ -61,7 +61,7 @@ public class AlarmService extends Service {
             builder = null;
             manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE); //버전 오레오 이상일 경우
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                manager.createNotificationChannel( new NotificationChannel(CHANNEL_ID, CHANEL_NAME, NotificationManager.IMPORTANCE_DEFAULT) );
+                manager.createNotificationChannel( new NotificationChannel(CHANNEL_ID, CHANEL_NAME, NotificationManager.IMPORTANCE_HIGH) ); ///
                 builder = new NotificationCompat.Builder(getApplicationContext(),CHANNEL_ID);
                 //하위 버전일 경우
             }
@@ -69,15 +69,12 @@ public class AlarmService extends Service {
                 builder = new NotificationCompat.Builder(getApplicationContext());
             }
 
-            //토스트 띄우기
-            //Toast.makeText(MyService.this, "서비스 테스트!!"+curDG, Toast.LENGTH_LONG).show();
-            Toast.makeText(AlarmService.this, "서비스 테스트!! 20년 잘가", Toast.LENGTH_LONG).show();
 
             //알림창 제목
             builder.setContentTitle("Daily Map");
 
             //알림창 메시지
-            builder.setContentText("다이어리가 추가되었습니다!");
+            builder.setContentText(curDG+"에 다이어리가 추가되었습니다.");
 
             //알림창 아이콘
             builder.setSmallIcon(R.drawable.ic_pin_dm_green_32);
@@ -85,9 +82,13 @@ public class AlarmService extends Service {
             //알림창 터치시 상단 알림상태창에서 알림이 자동으로 삭제되게 합니다.
             builder.setAutoCancel(true);
 
+            //head up settings
+            builder.setPriority(Notification.PRIORITY_HIGH); //headup
+
             //pendingIntent를 builder에 설정 해줍니다.
             // 알림창 터치시 인텐트가 전달할 수 있도록 해줍니다.
-            builder.setContentIntent(pendingIntent);
+            //builder.setContentIntent(pendingIntent);
+            builder.setFullScreenIntent(pendingIntent,true); //head up settings
 
             Notification notification = builder.build();
 

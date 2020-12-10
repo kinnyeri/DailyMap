@@ -132,15 +132,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
     protected void onStart() {
         super.onStart();
         //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //에러 남 > 로그아웃 안됨
-        if(user!=null){ //login 중
-            Log.d("DM", "로그인 : " + user.getDisplayName());
-            Toast.makeText(Main.this,user.getDisplayName(),Toast.LENGTH_SHORT).show();
-        }
-        else{ //user 없으면 signin page로 넘어가기
-            Log.d("DM", "no one");
-            Intent intent = new Intent(getApplicationContext(),SignIn.class);
-            startActivity(intent);
-        }
 
         if (checkPermission()) {
 
@@ -152,30 +143,25 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             //mMyLocationButtonView = mMapFragment.getView().findViewWithTag("GoogleMapMyLocationButton");
             //mMyLocationButtonView.setBackgroundColor(Color.GREEN);
         }
-
-        //다이어리 정보 유지
-        curDG = getIntent().getStringExtra("curDG"); //signin에서 받아온거 사용
-        Log.d("DM","현재 DG : "+curDG);
-        if(curDG==null) curDG = user.getDisplayName()+"'s diary";
-        Log.d("DM","현재 DG : "+curDG);
-
-        // DB에서 현재 DiaryGroup의 diaryList 정보 가져오기
-        db.collection("DiaryGroupList").document(curDG)
-                .collection("diaryList")
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            ArrayList<Map<String,Object>> dataList = new ArrayList<Map<String, Object>>();
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        dataList.add(document.getData());
+        if(user!=null){
+            // DB에서 현재 DiaryGroup의 diaryList 정보 가져오기
+            db.collection("DiaryGroupList").document(curDG)
+                    .collection("diaryList")
+                    .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                ArrayList<Map<String,Object>> dataList = new ArrayList<Map<String, Object>>();
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            dataList.add(document.getData());
+                        }
+                        addMarkerFromDB(dataList);
+                    } else {
+                        Toast.makeText(Main.this,"Failed to get diaryList",Toast.LENGTH_SHORT).show();
                     }
-                    addMarkerFromDB(dataList);
-                } else {
-                    Toast.makeText(Main.this,"Failed to get diaryList",Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -183,6 +169,24 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if(user==null){ //user 없으면 Singin page로 넘어가기
+            Log.d("DM", "no one");
+            Intent intent = new Intent(getApplicationContext(),SignIn.class);
+            startActivity(intent);
+        }
+        else{ // 로그인한 user 있음
+            Log.d("DM", "로그인 : " + user.getDisplayName());
+            Toast.makeText(Main.this,"Welcome "+user.getDisplayName(),Toast.LENGTH_SHORT).show();
+
+            //다이어리 정보 유지
+            curDG = getIntent().getStringExtra("curDG"); //signin에서 받아온거 사용
+            Log.d("DM","현재 DG : "+curDG);
+            if(curDG==null) curDG = user.getDisplayName()+"'s diary";
+            Log.d("DM","현재 DG : "+curDG);
+
+
+
+        }
         db = FirebaseFirestore.getInstance();
 
         mLayout = findViewById(R.id.layout_main);
