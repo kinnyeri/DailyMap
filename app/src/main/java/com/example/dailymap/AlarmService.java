@@ -19,7 +19,7 @@ public class AlarmService extends Service {
     }
 
     NotificationManager Notifi_M;
-    ServiceThread thread;
+    ServiceThread thread=null;
     Notification Notifi ;
     NotificationCompat.Builder builder;
     NotificationManager manager;
@@ -38,10 +38,15 @@ public class AlarmService extends Service {
         curDG = intent.getStringExtra("curDG");
         Notifi_M = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         myServiceHandler handler = new myServiceHandler();
-        thread = new ServiceThread(handler,curDG);
-        System.out.println("ServiceTest(Service): "+ curDG);
-        thread.setCurDG(curDG);
-        thread.start();
+        if(thread==null){
+            thread = new ServiceThread(handler,curDG);
+            System.out.println("ServiceTest(Service): "+ curDG);
+            //thread.setCurDG(curDG);
+            thread.start();
+        }
+        else{
+            thread.setCurDG(curDG);
+        }
         return START_STICKY;
     }
 

@@ -183,9 +183,6 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             Log.d("DM","현재 DG : "+curDG);
             if(curDG==null) curDG = user.getDisplayName()+"'s diary";
             Log.d("DM","현재 DG : "+curDG);
-
-
-
         }
         db = FirebaseFirestore.getInstance();
 
@@ -218,9 +215,9 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         geocoder = new Geocoder(this);
 
         //+++ =================알림 서비스 테스트!=====================
-        Intent intent = new Intent(Main.this,AlarmService.class);
-        intent.putExtra("curDG",curDG);
-        startService(intent);
+        Intent serviceIntent = new Intent(Main.this,AlarmService.class);
+        serviceIntent.putExtra("curDG",curDG);
+        startService(serviceIntent);
         //+++ ========================================================
 
 

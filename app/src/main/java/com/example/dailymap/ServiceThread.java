@@ -12,7 +12,10 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.Vector;
 
 public class ServiceThread extends Thread{
     Handler handler;
@@ -20,6 +23,7 @@ public class ServiceThread extends Thread{
     private FirebaseFirestore db;
     String curDG = null;
     int count =0;
+    ListenerRegistration registration;
 
     public ServiceThread(Handler handler){
         this.handler = handler;
@@ -38,16 +42,28 @@ public class ServiceThread extends Thread{
         }
     }
     public void setCurDG(String curDG){
-        isRun=false;
-        this.curDG = curDG;
-        isRun=true;
+        if(!this.curDG.equals(curDG)){
+            System.out.println("ServiceTest(remove): "+ this.curDG);
+            Log.d("ServiceTest", "REMOVE" + this.curDG);
+            registration.remove();
+            isRun=false;
+            System.out.println("ServiceTest(setCurDG): "+ curDG);
+            this.curDG = curDG;
+            isRun=true;
+            ListingDB();
+        }
     }
 
     public void run(){
+        System.out.println("ServiceTest(run): "+ curDG);
+        ListingDB();
+    }
+    public void ListingDB(){
+        count=0;
         if(isRun&&curDG!=null){
             // DB 리스너 - "20년 잘가" 다이어리 상태 리스닝 >> curDG로 변경 필요
             System.out.println("ServiceTest(Thread): "+ curDG);
-            db.collection("DiaryGroupList").document(curDG)
+            registration = db.collection("DiaryGroupList").document(curDG)
                     .collection("diaryList")
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
@@ -57,11 +73,9 @@ public class ServiceThread extends Thread{
                             for (DocumentChange dc : snapshots.getDocumentChanges()) {
                                 switch (dc.getType()) {
                                     case ADDED:
-                                        Log.d("ServiceTest", "ADDED" + dc.getDocument().getData());
-                                        Log.d("ServiceTest", "ADDED" + count);
                                         if(count>0){ // 추가적으로 업데이트되는 부분이 있을 때 알림 울리도록
-                                            Log.d("ServiceTest", "ADDED" + count);
-                                            handler.sendEmptyMessage(0);//쓰레드에 있는 핸들러에게 메세지를 보냄
+                                            handler.sendEmptyMessage(0);
+                                            Log.d("ServiceTest", "ADDED: " + count);
                                         }
                                         break;
                                     case MODIFIED:
