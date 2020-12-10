@@ -14,7 +14,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/DefaultTheme">
-        <activity android:name=".AddDiaryGroup"></activity>
+        <service
+            android:name=".AlarmService"
+            android:enabled="true"
+            android:exported="true"></service>
+
+        <activity android:name=".AddDiaryGroup" />
         <activity android:name=".SearchLocation" />
         <activity android:name=".Account" />
         <activity android:name=".SignIn" />
