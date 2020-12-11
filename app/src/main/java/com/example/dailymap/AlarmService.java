@@ -89,6 +89,7 @@ public class AlarmService extends Service {
 
             //head up settings
             builder.setPriority(Notification.PRIORITY_HIGH); //headup
+            builder.setTimeoutAfter(3500);
 
             //pendingIntent를 builder에 설정 해줍니다.
             // 알림창 터치시 인텐트가 전달할 수 있도록 해줍니다.
