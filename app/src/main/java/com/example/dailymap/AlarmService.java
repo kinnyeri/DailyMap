@@ -61,6 +61,7 @@ public class AlarmService extends Service {
         @Override
         public void handleMessage(android.os.Message msg) {
             Intent intent = new Intent(AlarmService.this, Main.class);
+            intent.putExtra("curDG",curDG);
             PendingIntent pendingIntent = PendingIntent.getActivity(AlarmService.this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
             builder = null;

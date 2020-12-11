@@ -160,7 +160,11 @@ public class Account extends AppCompatActivity {
                 Log.d("DM","로그아웃 시작");
                 FirebaseAuth.getInstance().signOut(); //Firebase logout
                 Intent intent = new Intent(getApplicationContext(),SignIn.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                Intent serviceIntent = new Intent(Account.this,AlarmService.class);
+                stopService(serviceIntent);
                 startActivity(intent);
+                finish();
             }
         });
         dgManager.setOnClickListener(new View.OnClickListener() {
