@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -36,9 +37,11 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        System.out.println("ServiceTest(onStartCommand): "+ curDG);
         curDG = intent.getStringExtra("curDG");
         uid=intent.getStringExtra("uid");
         Log.d("NotiAll","uid  "+uid);
+        System.out.println("ServiceTest(onStartCommand): "+ curDG);
 
         Notifi_M = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         myServiceHandler handler = new myServiceHandler();
@@ -49,6 +52,7 @@ public class AlarmService extends Service {
             thread.start();
         }
         else{
+            System.out.println("ServiceTest(onStartCommand->setCurDG): "+ curDG);
             thread.setCurDG(curDG,uid);
         }
         return START_STICKY;
@@ -64,9 +68,13 @@ public class AlarmService extends Service {
     class myServiceHandler extends Handler {
         @Override
         public void handleMessage(android.os.Message msg) {
+            super.handleMessage(msg);
             Intent intent = new Intent(AlarmService.this, Main.class);
             intent.putExtra("curDG",curDG);
             PendingIntent pendingIntent = PendingIntent.getActivity(AlarmService.this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+            Bundle bundle = msg.getData();
+            curDG = bundle.getString("curDG");
 
             builder = null;
             manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE); //버전 오레오 이상일 경우

@@ -155,6 +155,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             dataList.add(document.getData());
                         }
+                        System.out.println("ServiceTest(addmarker): "+ dataList);
                         addMarkerFromDB(dataList);
                     } else {
                         Toast.makeText(Main.this,"Failed to get diaryList",Toast.LENGTH_SHORT).show();
@@ -219,6 +220,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         serviceIntent.putExtra("curDG",curDG);
         serviceIntent.putExtra("uid",user.getUid());
 
+        System.out.println("ServiceTest(Start): "+ curDG+ user.getUid());
         startService(serviceIntent);
         //+++ ========================================================
 
