@@ -69,12 +69,13 @@ public class AlarmService extends Service {
         @Override
         public void handleMessage(android.os.Message msg) {
             super.handleMessage(msg);
-            Intent intent = new Intent(AlarmService.this, Main.class);
-            intent.putExtra("curDG",curDG);
-            PendingIntent pendingIntent = PendingIntent.getActivity(AlarmService.this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
             Bundle bundle = msg.getData();
             curDG = bundle.getString("curDG");
+
+            Intent intent = new Intent(AlarmService.this, Main.class);
+            intent.putExtra("curDG",curDG);
+            PendingIntent pendingIntent = PendingIntent.getActivity(AlarmService.this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
             builder = null;
             manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE); //버전 오레오 이상일 경우
