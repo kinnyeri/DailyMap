@@ -106,7 +106,6 @@ public class Account extends AppCompatActivity {
         try {
             getProfileThread.join();
             user_profile.setImageBitmap(profileImg);
-            Toast.makeText(getApplicationContext(),"get img succ",Toast.LENGTH_SHORT).show();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

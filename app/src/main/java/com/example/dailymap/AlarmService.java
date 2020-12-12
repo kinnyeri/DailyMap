@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -23,7 +24,7 @@ public class AlarmService extends Service {
     Notification Notifi ;
     NotificationCompat.Builder builder;
     NotificationManager manager;
-    String curDG;
+    String curDG,uid;
 
     private static String CHANNEL_ID = "channel1";
     private static String CHANEL_NAME = "Channel1";
@@ -36,16 +37,19 @@ public class AlarmService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         curDG = intent.getStringExtra("curDG");
+        uid=intent.getStringExtra("uid");
+        Log.d("NotiAll","uid  "+uid);
+
         Notifi_M = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         myServiceHandler handler = new myServiceHandler();
         if(thread==null){
-            thread = new ServiceThread(handler,curDG);
+            thread = new ServiceThread(handler,curDG,uid);
             System.out.println("ServiceTest(Service): "+ curDG);
             //thread.setCurDG(curDG);
             thread.start();
         }
         else{
-            thread.setCurDG(curDG);
+            thread.setCurDG(curDG,uid);
         }
         return START_STICKY;
     }

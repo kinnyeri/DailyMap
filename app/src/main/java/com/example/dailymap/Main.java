@@ -217,6 +217,8 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         //+++ =================알림 서비스 테스트!=====================
         Intent serviceIntent = new Intent(Main.this,AlarmService.class);
         serviceIntent.putExtra("curDG",curDG);
+        serviceIntent.putExtra("uid",user.getUid());
+
         startService(serviceIntent);
         //+++ ========================================================
 
