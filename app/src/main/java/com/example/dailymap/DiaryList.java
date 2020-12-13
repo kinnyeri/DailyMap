@@ -42,9 +42,6 @@ import java.util.Map;
 import java.util.Vector;
 
 public class DiaryList extends AppCompatActivity {
-    int[] thumbnails = {R.drawable.gallery,R.drawable.gallery,R.drawable.gallery,
-            R.drawable.gallery,R.drawable.jeju00};
-
     public Vector<Map<String,Object>> strImg;
     GridView gv;
     ImageView iv;

@@ -20,7 +20,7 @@
                 android:layout_height="wrap_content"
                 android:scaleType="fitCenter"
                 android:adjustViewBounds="true"
-                android:src="@drawable/jeju00" />
+                android:src="@drawable/gallery" />
             <TextView
                 android:id="@+id/writter_tag"
                 android:layout_width="wrap_content"
