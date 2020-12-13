@@ -75,6 +75,7 @@ public class AlarmService extends Service {
 
             Intent intent = new Intent(AlarmService.this, Main.class);
             intent.putExtra("curDG",curDG);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent pendingIntent = PendingIntent.getActivity(AlarmService.this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
             builder = null;
