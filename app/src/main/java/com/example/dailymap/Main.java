@@ -171,7 +171,7 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         setContentView(R.layout.activity_main);
 
         if(user==null){ //user 없으면 Singin page로 넘어가기
-            Log.d("DM", "no one");
+            Log.d("DM", "로그인된 사용자 없음");
             Intent intent = new Intent(getApplicationContext(),SignIn.class);
             startActivity(intent);
         }
@@ -182,8 +182,11 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
             //다이어리 정보 유지
             curDG = getIntent().getStringExtra("curDG"); //signin에서 받아온거 사용
             Log.d("DM","현재 DG : "+curDG);
-            if(curDG==null) curDG = user.getDisplayName()+"'s diary";
-            Log.d("DM","현재 DG : "+curDG);
+            if(curDG==null) {
+                curDG = user.getDisplayName()+"'s diary";
+                Log.d("DM","현재 DG : "+curDG);
+            }
+
         }
         db = FirebaseFirestore.getInstance();
 
@@ -215,14 +218,17 @@ public class Main extends AppCompatActivity implements OnMapReadyCallback {
         mMap = googleMap;
         geocoder = new Geocoder(this);
 
-        //+++ =================알림 서비스 테스트!=====================
-        Intent serviceIntent = new Intent(Main.this,AlarmService.class);
-        serviceIntent.putExtra("curDG",curDG);
-        serviceIntent.putExtra("uid",user.getUid());
+        if (user != null) {
+            //+++ =================알림 서비스 테스트!=====================
+            Intent serviceIntent = new Intent(Main.this,AlarmService.class);
+            serviceIntent.putExtra("curDG",curDG);
+            Log.d("NotiAll",user.getUid());
+            serviceIntent.putExtra("uid",user.getUid());
 
-        System.out.println("ServiceTest(Start): "+ curDG+ user.getUid());
-        startService(serviceIntent);
-        //+++ ========================================================
+            System.out.println("ServiceTest(Start): "+ curDG+ user.getUid());
+            startService(serviceIntent);
+            //+++ ========================================================
+        }
 
 
         //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에

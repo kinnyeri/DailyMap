@@ -16,6 +16,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -38,7 +39,7 @@ public class SignIn extends AppCompatActivity {
 
     //CFS
     private FirebaseFirestore db;
-
+    String key;
     @Override
     protected void onStart() {
         super.onStart();
@@ -64,6 +65,7 @@ public class SignIn extends AppCompatActivity {
             @Override
             public void onClick(View view){
                 //sign in 버튼 클릭 시
+                Log.d("DM","sign in btn 누름");
                 signIn();
             }
         });
@@ -91,6 +93,8 @@ public class SignIn extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
+                Log.d("DM","onActivityResult");
+
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account); //.getIdToken
@@ -111,18 +115,38 @@ public class SignIn extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(SignIn.this, "로그인 완료", Toast.LENGTH_SHORT).show();
-
                             //Database에 저장
-                            String key = user.getDisplayName()+"'s diary"; //다이어리 이름으로 document 아이디 설정
-                            addNewUser(new User(user.getDisplayName(),user.getEmail()),key,user.getUid());
-                            Log.d("DM","로그인 성공");
+                            key = user.getDisplayName()+"'s diary"; //다이어리 이름으로 document 아이디 설정
+                            Thread addUser = new Thread("add User"){
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                @Override
+                                public void run() {
+                                    super.run();
+                                    Log.d("DM","스레드 시작 singin");
+                                    addNewUser(new User(user.getDisplayName(),user.getEmail()),key,user.getUid());
 
-                            //UI 업데이트
-                            Intent intent = new Intent(getApplicationContext(),Main.class);
-                            intent.putExtra("curDG",key);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
-                            finish();
+                                    Log.d("DM","스레드 시작 singin");
+
+                                }
+                            };
+                            addUser.start();
+                            Thread finishSignIn = new Thread("finish Sign in"){
+                                @Override
+                                public void run() {
+                                    super.run();
+                                    Log.d("DM","스레드 시작 finish");
+
+                                    Log.d("DM","로그인 성공");
+                                    startMain();
+                                }
+                            };
+                            try{
+                                Thread.sleep(5000);
+                            } catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            finishSignIn.start();
+
                         } else {
                             // If sign in fails, display a message to the user
                             Toast.makeText(SignIn.this, "로그인 실패", Toast.LENGTH_SHORT).show();
@@ -134,6 +158,7 @@ public class SignIn extends AppCompatActivity {
         //FST
         tmp.diaryGroupList.add(key);
 
+        Log.d("DM","사용자 추가 함수 시작 "+key);
         db.collection("UserList")
                 .document(uid)
                 .get()
@@ -141,7 +166,9 @@ public class SignIn extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         DocumentSnapshot document = task.getResult();
-                        if(!document.exists()){
+                        Log.d("DM","해당 다이어리 없음");
+                        if(!document.exists()){ //!document.exists()
+                            Log.d("DM","사용자 존재 하지 않음");
                             document.getReference().set(tmp);
                             db.collection("DiaryGroupList").document(key)
                                     .set(new DiaryGroup(tmp.email))
@@ -151,8 +178,25 @@ public class SignIn extends AppCompatActivity {
                                             Log.d("DM","사용자 정보 저장 성공");
                                         }
                                     });
+                        }else{
+                            Log.d("DM","사용자 존재함");
                         }
                     }
-                });
+                }).addOnFailureListener(new OnFailureListener() {
+                @Override
+            public void onFailure(@NonNull Exception e) {
+                e.printStackTrace();
+
+            }
+        });
+    }
+
+    void startMain(){
+        //UI 업데이트
+        Intent intent = new Intent(getApplicationContext(),Main.class);
+        intent.putExtra("curDG",key);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 }
