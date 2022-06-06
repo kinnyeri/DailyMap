@@ -12,3 +12,6 @@ DailyMap : 장소 기반 일기장
 ## USED
 + Android Studio
 + Java
+
+## 참고 영상
+https://youtu.be/B-4G6ynEttA
